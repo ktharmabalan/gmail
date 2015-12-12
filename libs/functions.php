@@ -54,7 +54,7 @@ function expandHomeDirectory($path)
  * can be used to indicate the authenticated user.
  * @return array Array of Messages.
  */
-function listMessages($service, $maxResults)
+function message_list($service, $maxResults)
 {
     $user      = 'me';
     $pageToken = NULL;
@@ -67,16 +67,13 @@ function listMessages($service, $maxResults)
     
     $messagesResponse = $service->users_messages->listUsersMessages($user, $opt_param);
     if ($messagesResponse->getMessages()) {
-        $messages = array_merge($messages, $messagesResponse->getMessages());
+        $messageList = new MessageList();
+        foreach ($messagesResponse->getMessages() as $message) {
+            $messageList->addMessage(new MessageListItem($message->getThreadId(), $message->getId()));
+        }
+        return $messageList;
     }
     
-    $messageList = new MessageList();
-    
-    foreach ($messages as $message) {
-        $messageList->addMessage($message->getThreadId(), $message->getId());
-    }
-    
-    echo json_encode($messageList);
 }
 
 /**
@@ -88,21 +85,18 @@ function listMessages($service, $maxResults)
  * @param  string $messageId ID of Message to get.
  * @return Google_Service_Gmail_Message Message retrieved.
  */
-function getMessage($service, $userId, $messageId)
+function message_get($service, $userId, $messageId)
 {
     try {
-        $message = $service->users_messages->get($userId, $messageId);
-        // print 'Message with ID: ' . $message->getId() . ' retrieved.';
-        return $message;
+        return new MessageItem($service->users_messages->get($userId, $messageId));
     }
     catch (Exception $e) {
         print 'An error occurred: ' . $e->getMessage();
     }
 }
 
-function getLabel($service, $userId, $labelId) {
+function label_get($service, $userId, $labelId, $opt_param = array()) {
     try {
-        $opt_param = array();
 
         $label = $service->users_labels->get($userId, $labelId, $opt_param);
         return $label;
@@ -111,12 +105,11 @@ function getLabel($service, $userId, $labelId) {
     }
 }
 
-function listLabelsWithData($service)
+function label_list_extra($service, $userId)
 {
-    $user   = 'me';
     $labels = array();
     
-    $labelsResponse = $service->users_labels->listUsersLabels($user);
+    $labelsResponse = $service->users_labels->listUsersLabels($userId);
     if ($labelsResponse->getLabels()) {
         $labels = array_merge($labels, $labelsResponse->getLabels());
     }
@@ -124,7 +117,7 @@ function listLabelsWithData($service)
     $labelsList = array();
 
     foreach ($labels as $labelItem) {
-        $label = getLabel($service, $user, $labelItem->getId());
+        $label = getLabel($service, $userId, $labelItem->getId());
 
         $labelObject = new Label(
             $label->getId(),
@@ -141,18 +134,15 @@ function listLabelsWithData($service)
         array_push($labelsList, $labelObject);
         // echo $label->getName() . "<br>";
     }
-    echo '<pre>';
-    echo json_encode($labelsList);
-    echo '</pre>';
+
     return $labelsList;
 }
 
-function listLabels($service) {
+function label_list($service, $userId, $opt_param = array()) {
 {
-    $user   = 'me';
     $labels = array();
     
-    $labelsResponse = $service->users_labels->listUsersLabels($user);
+    $labelsResponse = $service->users_labels->listUsersLabels($userId);
     if ($labelsResponse->getLabels()) {
         $labels = array_merge($labels, $labelsResponse->getLabels());
     }
@@ -170,9 +160,7 @@ function listLabels($service) {
 
         array_push($labelsList, $labelObject);
     }
-    // echo '<pre>';
-    echo json_encode($labelsList);
-    // echo '</pre>';
+
     return $labelsList;
 }
 }
@@ -213,7 +201,7 @@ function listThreads($service, $maxResults)
     
     foreach ($threads as $thread) {
         
-        $threadItem   = getThread($service, $user, $thread->getId());
+        $threadItem   = thread_get($service, $user, $thread->getId());
         $threadObject = new Thread($threadItem->getId(), $threadItem->getHistoryId(), $threadItem->getSnippet());
         
         $threadMessages = $threadItem->getMessages();
@@ -328,6 +316,111 @@ function listThreads($service, $maxResults)
     // echo json_last_error_msg();
 }
 
+function getThreadList($service, $maxResults, $method = "") {
+    $user                          = 'me';
+    $pageToken                     = NULL;
+    $opt_param                     = array();
+    $opt_param['includeSpamTrash'] = false;
+    // $opt_param['maxResults'] = $maxResults;
+    // $opt_param['maxResults']       = 5;
+    $opt_param['labelIds']         = ['INBOX'];
+    // $opt_param['labelIds']         = ['INBOX', 'CATEGORY_PERSONAL'];
+    
+    $threadsResponse = $service->users_threads->listUsersThreads($user, $opt_param);   
+    
+    if ($threadsResponse->getThreads()) {
+        $threadObject = null;
+
+        if($method == "simple") {
+            // $threadObject = array();
+            $threadObject = new ThreadList();
+
+            foreach ($threadsResponse->getThreads() as $thread) {
+                $threadObject->addThread(new ThreadsSimple($thread->getId(), html_entity_decode($thread->getSnippet())));
+                // array_push($threadObject, new ThreadsSimple($thread->getId(), html_entity_decode($thread->getSnippet())));
+            }
+        } else if($method == "minimal") {
+            $threadObject = array();
+
+            foreach ($threadsResponse->getThreads() as $thread) {
+                // $messageResponse = $service->users_messages->
+                $threadItem   = thread_get($service, $user, $thread->getId());
+                printPre($threadItem);
+
+            }
+        } else if($method == "full") {
+            listThreads($service, $maxResults);
+        } else if($method == "allthreads") {
+            $threadObject = new ThreadList();
+
+            foreach ($threadsResponse->getThreads() as $thread) {
+                // $messageResponse = $service->users_messages->
+                $threadItem   = thread_get($service, $user, $thread->getId());
+                // $threadObject->addThread(new ThreadItem($threadItem));
+                printPre($threadItem);
+            }
+        }
+
+        if($threadObject != null) {
+            printPre($threadObject);
+        }
+    }
+}
+
+function thread_list($service, $maxResults, $opt_param = array()) {
+    $user                          = 'me';
+    $pageToken                     = NULL;
+    // $opt_param                     = array();
+    // $opt_param['includeSpamTrash'] = false;
+    // // $opt_param['maxResults'] = $maxResults;
+    // // $opt_param['maxResults']       = 5;
+    // $opt_param['labelIds']         = ['INBOX'];
+    // $opt_param['labelIds']         = ['INBOX', 'CATEGORY_PERSONAL'];
+    
+    $threadsResponse = $service->users_threads->listUsersThreads($user, $opt_param);   
+    
+    if ($threadsResponse->getThreads()) {
+        $threadObject = new ThreadList();
+
+        foreach ($threadsResponse->getThreads() as $thread) {
+            $threadObject->addThread(new ThreadsSimple($thread->getId(), html_entity_decode($thread->getSnippet())));
+        }
+
+        return $threadObject;
+    }
+}
+
+function printPre($data) {
+    // echo "<pre>";
+    print_r(json_encode($data));
+    // echo "</pre>";
+}
+
+// function listSimpleThreads($service, $maxResults) {
+//     $user                          = 'me';
+//     $pageToken                     = NULL;
+//     $opt_param                     = array();
+//     $opt_param['includeSpamTrash'] = false;
+//     // $opt_param['maxResults'] = $maxResults;
+//     // $opt_param['maxResults']       = 5;
+//     $opt_param['labelIds']         = 'INBOX';
+    
+//     // $threadObject = array();
+//     $threadObject = new ThreadList();
+    
+//     $threadsResponse = $service->users_threads->listUsersThreads($user, $opt_param);
+//     if ($threadsResponse->getThreads()) {
+//         foreach ($threadsResponse->getThreads() as $thread) {
+//             $threadObject->addThread(new ThreadsSimple($thread->getId(), html_entity_decode($thread->getSnippet())));
+//             // array_push($threadObject, new ThreadsSimple($thread->getId(), html_entity_decode($thread->getSnippet())));
+//         }
+//     }
+
+//     echo "<pre>";
+//     print_r($threadObject);
+//     echo "</pre>";
+// }
+
 function stripStyle($partBodyData) {
     $data = strtr($partBodyData, array(
         '-' => '+',
@@ -398,40 +491,46 @@ function subImagesInHtml($part, $images)
  * @param  string $threadId ID of Thread to get.
  * @return Google_Service_Gmail_Thread Retrieved Thread.
  */
-function getThread($service, $user, $threadId)
+function thread_get($service, $userId, $threadId)
 {
+    $user                          = $userId;
+    $pageToken                     = NULL;
+    $opt_param                     = array();
+    $opt_param['includeSpamTrash'] = false;
+    // $opt_param['maxResults'] = $maxResults;
+    // $opt_param['maxResults']       = 5;
+    $opt_param['labelIds']         = ['INBOX'];
+
     try {
         $thread   = $service->users_threads->get($user, $threadId);
-        $messages = $thread->getMessages();
-        $msgCount = count($messages);
-        // print 'Number of Messages in the Thread: ' . $msgCount;
-        return $thread;
+        return new ThreadItem($thread);
+        // printPre($threadObject);
     }
     catch (Exception $e) {
         print 'An error occurred: ' . $e->getMessage();
     }
 }
 
-function getAttachment($service, $user, $messageId, $attachmentId)
+function attachment_get($service, $userId, $messageId, $attachmentId, $opt_param = array())
 {
     try {
-        $opt_param  = array();
-        $attachment = $service->users_messages_attachments->get($user, $messageId, $attachmentId, $opt_param);
-        return $attachment;
+        return new BodyItem($service->users_messages_attachments->get($userId, $messageId, $attachmentId, $opt_param));
+        // $attachment = $service->users_messages_attachments->get($userId, $messageId, $attachmentId, $opt_param);
+        // return $attachment;
     }
     catch (Exception $e) {
         print 'An error occurred: ' . $e->getMessage();
     }
 }
 
-function getAttachmentAndWrite($service, $user, $messageId, $attachmentId, $fileName, $mimeType)
+function attachment_get_with_images($service, $userId, $messageId, $attachmentId, $fileName, $mimeType)
 {
     try {
         $mimeExplode = explode("/", $mimeType);
         $mime        = $mimeExplode[0];
         
         $opt_param  = array();
-        $attachment = $service->users_messages_attachments->get($user, $messageId, $attachmentId, $opt_param);
+        $attachment = $service->users_messages_attachments->get($userId, $messageId, $attachmentId, $opt_param);
         
         $attachmentObject = new Attachment($attachment->getAttachmentId(), $attachment->getData(), $attachment->getSize());
         // echo json_encode($attachmentObject);
@@ -479,6 +578,7 @@ function loadPage($title = "Gmail Api")
   <meta name="viewport" content="width=device-width, initial-scale=1"> -->
   <title><?= htmlspecialchars($title) ?></title>
     <!-- css -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="assets/css/vendor/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 

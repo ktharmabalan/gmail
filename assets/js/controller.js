@@ -40,7 +40,7 @@
     }]);
 
     app.controller('labelsController', ['$scope', '$http', 'sharedProperties', function($scope, $http, sharedProperties) {
-        $http.get("/gmail/data.php?search=labels").success(function(response) {
+        $http.get("/gmail/data.php?search=label&method=list").success(function(response) {
             $scope.labels = response;
 
             $scope.topLabels = [];
@@ -56,18 +56,45 @@
 
             sharedProperties.setTopLabels($scope.topLabels);
 
-            $scope.setSelectedLabel = function(label) {
-                $scope.selected = label;
-                sharedProperties.setActiveLabel(label);
-                sharedProperties.setActiveLabelName(label);
-            };
-
-            $scope.isLabelSelected = function(label) {
-                return $scope.selected === label;
-            }
-
             $scope.setSelectedLabel($scope.topLabels[0]);
         });
+
+        $scope.setSelectedLabel = function(label) {
+            $scope.selected = label;
+            sharedProperties.setActiveLabel(label);
+            sharedProperties.setActiveLabelName(label);
+            $scope.getData("thread", "list", 'labelIds']);
+        };
+
+        $scope.isLabelSelected = function(label) {
+            return $scope.selected === label;
+        }
+
+        $scope.getData = function(search, method, opt_params) {
+        	console.log("/gmail/data.php?search=" + search + "&method=" + method + "params=" + opt_params);
+        	$http.get("/gmail/data.php?search=" + search + "&method=" + method).success(function(response) {
+        		console.log(response);
+        	});
+        // 	$http({
+        // 		url: "/gmail/data.php",
+        // 		method: "GET",
+        // 		params: {
+        // 			'search': search,
+        // 			'method': method
+        // 		}
+        // 	}).
+		      //   then(function(response) {
+		      //   	console.log("Response 1");
+		      //   	console.log(response.data);
+		      //     // $scope.status = response.status;
+		      //     // $scope.data = response.data;
+		      //   }, function(response) {
+		      //   	console.log("Response 2 " + response.data || "Request failed" + response.status);
+		      //     // $scope.data = response.data || "Request failed";
+		      //     // $scope.status = response.status;
+		      // });
+        };
+
     }]);
 
     app.controller('threadsController', ['$scope', '$http', '$sce', '$filter', 'sharedProperties', function($scope, $http, $sce, $filter, sharedProperties) {

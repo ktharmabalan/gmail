@@ -1,24 +1,21 @@
 <?php
-// class Message {
-// 	$threadId;
-// 	$messageId;
-// }
+class MessageListItem {
+    var $threadId;
+    var $messageId;
 
-class MessageList
-{
-    var $messageList = array();
-    
-    function MessageList()
-    {
+    function __construct($threadId, $messageId) {
+        $this->threadId = $threadId;
+        $this->messageId = $messageId;
     }
-    
-    function addMessage($threadId, $messageId)
-    {
-        // array_push($messageList, new Message($threadId, $messageId));
-        array_push($this->messageList, array(
-            'threadId' => $threadId,
-            'messageId' => $messageId
-        ));
+}
+
+class MessageList {
+    var $messageList = array();
+
+    function __construct() {}
+
+    function addMessage($message) {
+        array_push($this->messageList, $message);
     }
 }
 
@@ -26,14 +23,8 @@ class ThreadList
 {
     var $threadList = array();
     
-    function ThreadList()
-    {
-    }
-    
-    // function addThread($threadId, $historyId, $snippet) {
-    // 	array_push($this->threadList, array('threadId' => $threadId, 'historyId' => $historyId, 'snippet' => $snippet));
-    // }
-    
+    function __construct() {}
+
     function addThread($thread)
     {
         array_push($this->threadList, $thread);
@@ -61,6 +52,135 @@ class Thread
     function addMessage($message)
     {
         array_push($this->messages, $message);
+    }
+}
+
+class ThreadItem {
+    var $threadId;
+    var $historyId;
+    var $snippet;
+    var $messages = array();
+
+    function __construct($thread) {
+        $this->threadId  = $thread->getId();
+        $this->historyId = $thread->getHistoryId();
+        $this->snippet   = $thread->getSnippet();
+
+        foreach ($thread->getMessages() as $message) {
+            $this->addMessage($message);
+        }
+        // $this->messages = $thread->getMessages();
+    }
+    
+    function addMessage($message)
+    {
+        array_push($this->messages, new MessageItem($message));
+    }
+}
+
+class MessageItem {
+    var $historyId;
+    var $messageId;
+    var $sizeEstimate;
+    var $snippet;
+    var $threadId;
+    var $labelIds = array();
+    var $payload;
+    var $raw;
+    
+    // function __construct($messageId, $historyId, $internalDate, $labelIds, $sizeEstimate, $snippet, $threadId) {
+    function __construct($message)
+    {
+        $this->messageId    = $message->getId();
+        $this->historyId    = $message->getHistoryId();
+        $this->sizeEstimate = $message->getSizeEstimate();
+        $this->snippet      = $message->getSnippet();
+        $this->threadId     = $message->getThreadId();
+        $this->addLabels($message->getLabelIds());
+        $this->setPayload($message->getPayload());
+        $this->setRaw($message->getRaw());
+    }
+    
+    function addLabels($labels)
+    {
+        foreach ($labels as $label) {
+            array_push($this->labelIds, $label);
+        }
+    }
+    
+    function setPayload($payload)
+    {
+        $this->payload = new PayloadItem($payload);
+    }   
+
+    function setRaw($raw) {
+        $this->raw = $raw;
+    }
+}
+
+class PayloadItem {
+    var $body;
+    var $fileName;
+    var $headers = array();
+    var $mimeType;
+    var $partId;
+    var $parts = array();
+
+    function __construct($payload) {
+        $this->fileName = $payload->getFilename();
+        $this->mimeType = $payload->getMimeType();
+        $this->partId = $payload->getPartId();
+        $this->addHeaders($payload->getHeaders());
+        $this->body = new PayloadBodyItem($payload->getBody());
+        if($payload->getParts()) {
+            foreach ($payload->getParts() as $part) {
+                array_push($this->parts, new PayloadItem($part));
+            }
+        }
+    }
+
+    function addHeaders($headers) {
+        foreach ($headers as $header) {
+            $this->headers[$header->getName()] = $header->getValue();
+        }
+    }
+}
+
+class BodyItem {
+    var $attachmentId;
+    var $data;
+    var $size;
+
+    function __construct($body) {
+        $this->attachmentId = $body->getAttachmentId();
+        $this->data = $body->getData();
+        $this->size = $body->getSize();
+    }
+}
+
+class PayloadBodyItem extends BodyItem {
+    // var $attachmentId;
+    // var $data;
+    // var $size;
+
+    // function __construct($body) {
+    //     $this->attachmentId = $body->getAttachmentId();
+    //     $this->data = $body->getData();
+    //     $this->size = $body->getSize();
+    // }
+}
+
+class AttachmentItem {
+    function __construct($attachment) {}
+}
+
+class HeaderItem {
+    var $name;
+    var $value;
+
+    function __construct($header) {
+        $this->name = $header->getName();
+        $this->value = $header->getValue();
     }
 }
 
@@ -325,5 +445,15 @@ class Attachment
         $this->attachmentId = $attachmentId;
         $this->data         = $data;
         $this->size         = $size;
+    }
+}
+
+class ThreadsSimple {
+    var $id;
+    var $snippet;
+
+    function __construct($id, $snippet) {
+        $this->id = $id;
+        $this->snippet = $snippet;
     }
 }

@@ -35,32 +35,79 @@ if (file_exists($credentialsPath)) {
     $client  = getClient();
     $client  = getAccessToken($client);
     $service = new Google_Service_Gmail($client);
+    $optParams = array();
     
     if (isset($_GET['search'])) {
+        $userId       = 'me';
         $search     = $_GET['search'];
+        $method     = $_GET['method'];
+
+        if(isset($_GET['q'])) {
+            $optParams['q'] = $_GET['q'];
+        }
+
+        if(isset($_GET['pageToken'])) {
+            $optParams['pageToken'] = $_GET['pageToken'];
+        }
+
+        if(isset($_GET['includeSpamTrash'])) {
+            $includeSpamTrash = $_GET['includeSpamTrash'];
+        }
+
+        if(isset($_GET['labelIds'])) {
+            $labelIds = explode(",", $_GET['labelIds']);
+        }
+
+        if(isset($_GET['id'])) {
+            $id     = $_GET['id'];
+        }
+            
         $maxResults = 2;
         
         if (isset($_GET['maxResults']) && is_numeric($_GET['maxResults']) && $_GET['maxResults'] >= 1) {
             $maxResults = round($_GET['maxResults']);
         }
-        
-        // echo "<pre>";
+
+        $result = null;
         switch ($search) {
-            case 'threads':
+            case 'thread':
                 // Get Threads
-                listThreads($service, $maxResults);
-                // listLabels($service);
-                
+                if($method == "list") {
+                    $result = thread_list($service, $maxResults);
+                } else if($method == "get") {
+                    $result = thread_get($service, $userId, $id);
+                }
                 break;
-            case 'messages':
-                listMessages($service, $maxResults);
+            case 'message':
+                if($method == "list") {
+                    $result = message_list($service, $maxResults);
+                } else if($method == "get") {
+                    $result = message_get($service, $userId, $id);
+                }
                 break;
-            case 'labels':
-                listLabels($service);
+            case 'label':
+                if($method == "list") {
+                    if(isset($_get['extra'])) {
+                        $result = label_list_extra($service, $userId);
+                    } else {
+                        $result = label_list($service, $userId);
+                    }
+                } else if($method == "get") {
+                    $result = label_get($service, $userId, $id);
+                }
                 break;
+            case 'attachment':
+                if($method == "get") {
+                    if(isset($_GET['messageId'])) {
+                        $messageId = $_GET['messageId'];
+                        $result = attachment_get($service, $userId, $messageId, $id);
+                    }
+                }
             default:
                 break;
         }
-        // echo "</pre>";
+        if($result != null) {
+            printPre($result);
+        }
     }
 }
