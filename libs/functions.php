@@ -367,7 +367,7 @@ function getThreadList($service, $maxResults, $method = "") {
     }
 }
 
-function thread_list($service, $maxResults, $opt_param = array()) {
+function thread_list($service, $opt_param = array()) {
     $user                          = 'me';
     $pageToken                     = NULL;
     // $opt_param                     = array();
@@ -587,12 +587,13 @@ function loadPage($title = "Gmail Api")
     <script src="assets/js/vendor/bootstrap/bootstrap.min.js"></script>
 
     <script type="text/javascript" src="assets/js/vendor/angular/angular.min.js"></script>
+    <script type="text/javascript" src="assets/js/vendor/angular/angular-animate.min.js"></script>
     <!-- // <script type="text/javascript" src="assets/js/vendor/angular/angular-route.min.js"></script> -->
     <script type="text/javascript" src="assets/js/controller.js"></script>
     <script type="text/javascript" src="assets/js/script.js"></script>
 </head>
 <body>
-  <div class="container-fluid">
+  <div class="container-fluid" ng-controller="mainController">
   <!-- __DIR__ . '/../assets/partials/email.php' -->
   <?php
     require_once __DIR__ . '/../assets/partials/email.php';

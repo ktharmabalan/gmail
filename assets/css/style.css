@@ -70,3 +70,33 @@
     background: rgba(243, 243, 243, .85);
     color: #222;
 }
+
+.message-item.ng-enter.ng-enter-active,
+.message-item.ng-leave {
+    opacity: 1,
+    height: 80px;
+    overflow: hidden;
+}
+
+.message-item.ng-leave.ng-leave-active,
+.message-item.ng-enter {
+    opacity: 0,
+    height: 0;
+    overflow: hidden;
+}
+
+/*.top-label {
+    opacity: .9;
+    -webkit-transition: all 0.3s ease-out;
+    -moz-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+}
+
+.top-label:hover {
+    opacity: 1;
+    -webkit-transform: scale(1.2);
+    -moz-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+}*/

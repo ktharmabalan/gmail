@@ -23,20 +23,20 @@
     <li><a href="#">20</a></li>
   </ul>
 </div> -->
-<div ng-controller="labelsController">
+<div>
   <ul class="nav nav-pills">
-    <li role="presentation" ng-repeat="label in topLabels" ng-click="setSelectedLabel(label)" class="col-md-2" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }}</a></li>
+    <li role="presentation" ng-repeat="label in topLabels" ng-click="setSelectedLabel(label)" class="col-md-2 top-label" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }}</a></li>
   </ul>
 </div>
-<div class="clearfix email-container" ng-controller="threadsController">
+<div class="clearfix email-container">
   <div class="col-md-1 label-container">
-    <ul ng-repeat="label in labels">
-      <li>{{ label.name }}</li>
-    </ul>
+<!--     <ul>
+      <li ng-repeat="label in labels">{{ label.name }}</li>
+    </ul> -->
   </div>
-
     <div class="col-md-3 message-item-container">
-    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" ng-show="thread.messages[0].labelIds.indexOf(getSelectedLabel()) != -1" class="message-item" ng-class="{'selected-message-item': isThreadSelected(thread)}">
+     <!-- ng-show="thread.messages[0].labelIds.indexOf(getSelectedLabel()) != -1" -->
+    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'selected-message-item': isThreadSelected(thread)}">
       <div class="row">
         <div class="col-md-8">
             <p>{{ thread.messages[0].payload.headers['From'] }}</p>
@@ -53,17 +53,28 @@
     </div>
   </div>
   <div class="col-md-8 message-container">
-      <p><strong>Subject:</strong> {{ selected.messages[0].payload.headers['Subject'] }}</p>
-      <p><strong>From:</strong> {{ selected.messages[0].payload.headers['From'] }}</p>
-      <p><strong>Sent:</strong> {{ }}
-      <p><strong>To:</strong> {{ selected.messages[0].payload.headers['To'] }}</p>
-      <!-- <div ng-repeat="part in selected.messages[0].payload.parts"> -->
-        <!-- <div>{{ part.body[0].data }}</div> -->
-        <!-- <div ng-bind-html="renderHtml(part.body[0].data)"></div> -->
-      <!-- </div> -->
+    <div ng-repeat="message in selectedThread.messages">
+      <p><strong>Labels:</strong> {{message.labelIds}}</p>
+      <p><strong>Subject:</strong> {{ message.payload.headers['Subject'] }}</p>
+      <p><strong>From:</strong> {{ message.payload.headers['From'] }}</p>
+      <p><strong>To:</strong> {{ message.payload.headers['To'] }}</p>
+      <p><strong>Date:</strong> {{ message.payload.headers['Date'] }}</p>
+      <!-- {{message.payload.parts}} -->
+      <div ng-repeat="part in message.payload.parts">
+        <div ng-if="part.mimeType === 'text/html'">
+          <div ng-bind-html="renderHtml(part.body.data)"></div>
+        </div>
+        <hr>
+      </div>
+<!--       <div ng-bind-html="renderHtml(message.payload.parts[1].body[0].data)"></div>
+      <div ng-bind-html="renderHtml(message.payload.parts[0].parts[1].body[0].data)"></div> -->
+      <hr>
+    </div>
+<!--       <p><strong>Subject:</strong> {{ selectedThread.messages[0].payload.headers['Subject'] }}</p>
+      <p><strong>From:</strong> {{ selectedThread.messages[0].payload.headers['From'] }}</p>
+      <p><strong>To:</strong> {{ selectedThread.messages[0].payload.headers['To'] }}</p>
     
-      <!-- {{selected.messages[0].payload.parts[0].parts[1].body[0].data}} -->
-      <div ng-bind-html="renderHtml(selected.messages[0].payload.parts[1].body[0].data)"></div>
-      <div ng-bind-html="renderHtml(selected.messages[0].payload.parts[0].parts[1].body[0].data)"></div> 
+      <div ng-bind-html="renderHtml(selectedThread.messages[0].payload.parts[1].body[0].data)"></div>
+      <div ng-bind-html="renderHtml(selectedThread.messages[0].payload.parts[0].parts[1].body[0].data)"></div>  -->
   </div>
 </div>

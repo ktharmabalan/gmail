@@ -55,25 +55,29 @@ if (file_exists($credentialsPath)) {
         }
 
         if(isset($_GET['labelIds'])) {
+            $labelIds = array();
             $labelIds = explode(",", $_GET['labelIds']);
+            $optParams['labelIds'] = $labelIds;
         }
 
         if(isset($_GET['id'])) {
             $id     = $_GET['id'];
         }
             
-        $maxResults = 2;
+        $maxResults = 10;
         
         if (isset($_GET['maxResults']) && is_numeric($_GET['maxResults']) && $_GET['maxResults'] >= 1) {
             $maxResults = round($_GET['maxResults']);
         }
+
+        $optParams['maxResults'] = $maxResults;
 
         $result = null;
         switch ($search) {
             case 'thread':
                 // Get Threads
                 if($method == "list") {
-                    $result = thread_list($service, $maxResults);
+                    $result = thread_list($service, $optParams);
                 } else if($method == "get") {
                     $result = thread_get($service, $userId, $id);
                 }
