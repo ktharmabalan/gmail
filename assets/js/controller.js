@@ -8,27 +8,45 @@
         $scope.labels;
         $scope.topLabels = [];
         $scope.selectedLabel;
-        $scope.sideLabels = [];
+        $scope.categories;
+        $scope.selectedCategory;
 
         // document.location.href = "data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,ANGjdJ9mM_7gY_g5KqYgs1EUazSxQdBbKqnOYmU6-smR74nrawcheupM-uS7vWmezWO7nONQukQVWoObrZbSsCA4byA7yfL9n9rNqduaryhvAuNdWdh_cxWYoBnPmOagTinH9xew5RQUlKoRUDXOmYopkFO2d9NwbbJT_IC9Ts9vr9iB6-G3-uT8JEQBtv6l5-F1d7H1Nd0lw8a_i5tDJdc0KFy_8Q-6Q5wJCG0J9g";
 
-        // $scope.isUnread = function(thread) {
-        //     angular.forEach(values, function(value, key){
-                
-        //     });
-        // }
+        $scope.isUnread = function(thread) {
+            var unread = false;
+            angular.forEach(thread.messages, function(value, key){
+                if(value.labelIds.indexOf("UNREAD") !== -1) {
+                    // console.log(value.labelIds + ": " + (value.labelIds.indexOf("UNREAD") !== -1));
+                    unread = true;
+                }
+            });
+            return unread;
+        }
 
         $scope.setSelectedLabel = function(label) {
             $scope.selectedLabel = label;
-            var obj = {'search': 'thread', 'method': 'list', 'labelIds': 'INBOX'};
-            // obj.labelIds = obj.labelIds + "," + "SENT";
-            obj.labelIds = obj.labelIds + "," + label.name; 
-            // console.log(obj);
-            $scope.getData(obj);
-        }
 
         $scope.isLabelSelected = function(label) {
             return $scope.selectedLabel === label;
+        }
+
+        $scope.setSelectedCategory = function(category) {
+            $scope.selectedCategory = category;
+            var obj = {'search': 'thread', 'method': 'list', 'labelIds': category.id};
+            // obj.labelIds = obj.labelIds + "," + "SENT";
+            // obj.labelIds = obj.labelIds + "," + label.name; 
+            // console.log(obj);
+            $scope.getData(obj);
+        }
+        };
+
+        $scope.isCategorySelected = function(category) {
+            return $scope.selectedCategory === category;
+        };
+
+        $scope.getSelectedCategory = function() {
+            return $scope.selectedCategory;
         }
 
         $scope.clearThreads = function() {
@@ -192,6 +210,7 @@
                     $scope.addToThreads(response);
                 } else if(args['search'] == "label" && args['method'] == "list") {
                     $scope.labels = response;
+                    $scope.categories = response;
                     angular.forEach($scope.labels, function(value, index) {
                         if (value.name.indexOf("CATEGORY_") != -1) {
                             $scope.topLabels.push({
@@ -201,6 +220,7 @@
                         }
                     });
                     $scope.setSelectedLabel($scope.topLabels[0]);
+                    $scope.setSelectedCategory($scope.categories[0]);
                 }
             });
         };
@@ -208,6 +228,18 @@
         $scope.getData({'search': 'label', 'method': 'list'});
         // $scope.getData({'search': 'label', 'method': 'list', 'extra': 'true'});
     }]);
+
+    app.filter('capitalize', function() {
+        return function(s) {
+            return (angular.isString(s) && s.length > 0) ? s[0].toUpperCase() + s.substr(1).toLowerCase() : s;
+        }
+    });
+
+    app.filter('removeCategory', function() {
+        return function(s) {
+            return (angular.isString(s) && s.length > 0 && s.indexOf('CATEGORY_') > -1) ? s.toUpperCase().replace('CATEGORY_', '') : s;
+        }
+    });
     
 /*    EEE, d MMM yyyy h:mm:ss -Z
     Thu, 3 Dec 2015 11:52:40 -0500

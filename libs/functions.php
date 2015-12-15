@@ -637,7 +637,8 @@ function loadPage($title = "Gmail Api")
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="assets/css/vendor/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
+    
     <!-- javascripts -->
     <script src="assets/js/vendor/jquery/jquery-2.1.4.min.js"></script>
     <script src="assets/js/vendor/bootstrap/bootstrap.min.js"></script>

@@ -23,20 +23,20 @@
     <li><a href="#">20</a></li>
   </ul>
 </div> -->
-<div>
+<div ng-if="getSelectedCategory().id === 'INBOX'">
   <ul class="nav nav-pills">
-    <li role="presentation" ng-repeat="label in topLabels" ng-click="setSelectedLabel(label)" class="col-md-2 top-label" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }}</a></li>
+    <li role="presentation" ng-repeat="label in topLabels" ng-click="setSelectedLabel(label)" class="col-md-2 top-label" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }} <span class="badge">42</span></a></li>
   </ul>
 </div>
 <div class="clearfix email-container">
   <div class="col-md-1 label-container">
     <ul>
-      <li ng-repeat="label in labels">{{ label.name }}</li>
+      <li ng-repeat="category in categories" ng-click="setSelectedCategory(category)" class="side-label" ng-class="{'selected-side-label': isCategorySelected(category)}"><div>{{ category.name | removeCategory | capitalize }}</div></li>
     </ul>
   </div>
   <div class="col-md-3 message-item-container">
      <!-- ng-show="thread.messages[0].labelIds.indexOf(getSelectedLabel()) != -1" -->
-    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'selected-message-item': isThreadSelected(thread), 'unread': isUnread(thread)}">
+    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'unread': isUnread(thread), 'selected-message-item': isThreadSelected(thread)}">
       <div class="row">
         <div class="col-md-8">
             <p>{{ thread.messages[0].payload.headers['From'] }}</p>
@@ -55,6 +55,7 @@
   <div class="col-md-8 message-container">
     <!-- <p>{{ selectedThread.threadId }}</p> -->
     <div ng-repeat="message in selectedThread.messages">
+      <i class="glyphicon glyphicon-paperclip"></i>
       <p><strong>Labels:</strong> {{message.labelIds}}</p>
       <p><strong>Subject:</strong> {{ message.payload.headers['Subject'] }}</p>
       <p><strong>From:</strong> {{ message.payload.headers['From'] }}</p>
