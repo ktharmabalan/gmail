@@ -59,6 +59,7 @@
     /*border: 1px solid black;*/
     /*margin: 10px 0;*/
     /*padding: 10px;*/
+    background-color: rgba(243,243,243,.85);
 }
 
 .selected-message-item {
@@ -83,6 +84,10 @@
     opacity: 0,
     height: 0;
     overflow: hidden;
+}
+
+.unread {
+    background-color: #fff;
 }
 
 /*.top-label {

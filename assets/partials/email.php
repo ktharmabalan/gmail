@@ -30,13 +30,13 @@
 </div>
 <div class="clearfix email-container">
   <div class="col-md-1 label-container">
-<!--     <ul>
+    <ul>
       <li ng-repeat="label in labels">{{ label.name }}</li>
-    </ul> -->
+    </ul>
   </div>
-    <div class="col-md-3 message-item-container">
+  <div class="col-md-3 message-item-container">
      <!-- ng-show="thread.messages[0].labelIds.indexOf(getSelectedLabel()) != -1" -->
-    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'selected-message-item': isThreadSelected(thread)}">
+    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'selected-message-item': isThreadSelected(thread), 'unread': isUnread(thread)}">
       <div class="row">
         <div class="col-md-8">
             <p>{{ thread.messages[0].payload.headers['From'] }}</p>
@@ -53,28 +53,35 @@
     </div>
   </div>
   <div class="col-md-8 message-container">
+    <!-- <p>{{ selectedThread.threadId }}</p> -->
     <div ng-repeat="message in selectedThread.messages">
       <p><strong>Labels:</strong> {{message.labelIds}}</p>
       <p><strong>Subject:</strong> {{ message.payload.headers['Subject'] }}</p>
       <p><strong>From:</strong> {{ message.payload.headers['From'] }}</p>
       <p><strong>To:</strong> {{ message.payload.headers['To'] }}</p>
       <p><strong>Date:</strong> {{ message.payload.headers['Date'] }}</p>
-      <!-- {{message.payload.parts}} -->
+      
+      <div ng-if="message.payload.body.data !== null">
+        <pre>{{message.payload.body.data}}</pre>
+      </div>
+
       <div ng-repeat="part in message.payload.parts">
         <div ng-if="part.mimeType === 'text/html'">
           <div ng-bind-html="renderHtml(part.body.data)"></div>
         </div>
-        <hr>
+<!--         <div ng-if="part.mimeType === 'text/plain'">
+          <div>{{part.body.data}}</div>
+        </div> -->
+        <div ng-repeat="pp in part.parts">
+          <div ng-if="pp.mimeType === 'text/html'">
+            <div ng-bind-html="renderHtml(pp.body.data)"></div>
+          </div>
+<!--           <div ng-if="pp.mimeType === 'text/plain'">
+            <div>{{pp.body.data}}</div>
+          </div> -->
+        </div>
       </div>
-<!--       <div ng-bind-html="renderHtml(message.payload.parts[1].body[0].data)"></div>
-      <div ng-bind-html="renderHtml(message.payload.parts[0].parts[1].body[0].data)"></div> -->
       <hr>
     </div>
-<!--       <p><strong>Subject:</strong> {{ selectedThread.messages[0].payload.headers['Subject'] }}</p>
-      <p><strong>From:</strong> {{ selectedThread.messages[0].payload.headers['From'] }}</p>
-      <p><strong>To:</strong> {{ selectedThread.messages[0].payload.headers['To'] }}</p>
-    
-      <div ng-bind-html="renderHtml(selectedThread.messages[0].payload.parts[1].body[0].data)"></div>
-      <div ng-bind-html="renderHtml(selectedThread.messages[0].payload.parts[0].parts[1].body[0].data)"></div>  -->
   </div>
 </div>

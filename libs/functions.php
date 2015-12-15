@@ -73,7 +73,6 @@ function message_list($service, $maxResults)
         }
         return $messageList;
     }
-    
 }
 
 /**
@@ -88,7 +87,19 @@ function message_list($service, $maxResults)
 function message_get($service, $userId, $messageId)
 {
     try {
-        return new MessageItem($service->users_messages->get($userId, $messageId));
+        $mimeTypes   = array(
+            "image/png",
+            "image/bmp",
+            "image/gif",
+            "image/jpeg",
+            "image/tiff"
+        );
+        $messageItem = new MessageItem($service->users_messages->get($userId, $messageId));
+        // printPre($messageItem);
+        // foreach ($messageItem->payload as $key => $value) {
+        //     echo $key;
+        // }
+        return $messageItem;
     }
     catch (Exception $e) {
         print 'An error occurred: ' . $e->getMessage();
@@ -117,7 +128,7 @@ function label_list_extra($service, $userId)
     $labelsList = array();
 
     foreach ($labels as $labelItem) {
-        $label = getLabel($service, $userId, $labelItem->getId());
+        $label = label_get($service, $userId, $labelItem->getId());
 
         $labelObject = new Label(
             $label->getId(),
@@ -390,12 +401,6 @@ function thread_list($service, $opt_param = array()) {
     }
 }
 
-function printPre($data) {
-    // echo "<pre>";
-    print_r(json_encode($data));
-    // echo "</pre>";
-}
-
 // function listSimpleThreads($service, $maxResults) {
 //     $user                          = 'me';
 //     $pageToken                     = NULL;
@@ -448,11 +453,13 @@ function subImagesInHtml($part, $images)
 {
     $image_arr = array();
     
-    foreach ($images as $image) {
-        $image_arr = array_merge($image_arr, $image);
+    foreach ($images as $id => $image) {
+        // echo $id .":".$image."\n";
+        $image_arr[$id] = $image;
     }
     
-    $data = strtr($part->body[0]->data, array(
+    // $part->body[0]->data
+    $data = strtr($part, array(
         '-' => '+',
         '_' => '/'
     ));
@@ -466,9 +473,9 @@ function subImagesInHtml($part, $images)
     }
 
     foreach ($doc->getElementsByTagName("style") as $style) {
-        echo $style;
+        // echo $style;
         $style->parentNode->removeChild($style);
-        print_r($style);
+        // print_r($style);
         $doc->saveHTML();
     }
 
@@ -480,6 +487,12 @@ function subImagesInHtml($part, $images)
         '/' => '_'
     ));
     return $encodedDom;
+}
+
+function printPre($data) {
+    // echo "<pre>";
+    print_r(json_encode($data));
+    // echo "</pre>";
 }
 
 /**
@@ -502,8 +515,51 @@ function thread_get($service, $userId, $threadId)
     $opt_param['labelIds']         = ['INBOX'];
 
     try {
+        $mimeTypes   = array(
+            "image/png",
+            "image/bmp",
+            "image/gif",
+            "image/jpeg",
+            "image/tiff"
+        );
+    
         $thread   = $service->users_threads->get($user, $threadId);
-        return new ThreadItem($thread);
+        $threadItem = new ThreadItem($thread);
+        // return $threadItem;
+        $threadItem->hasAttachments = false;
+
+        foreach ($threadItem->messages as $key => $message) {
+            $images = [];
+            $image;
+
+            foreach ($message->payload->parts as $payload) {
+                if(in_array($payload->mimeType, $mimeTypes)) {
+                    $image = attachment_get_with_images($service, $userId, $message->messageId, $payload->body->attachmentId, $payload->fileName, $payload->mimeType);
+                    $images[key($image)] = $image[key($image)];
+                }
+            }
+            $threadItem->messages[$key]->images = $images;
+            $threadItem->hasAttachments = true;
+            // printPre($threadItem->messages[$key]->images);
+        }
+
+        if($threadItem->hasAttachments) {
+            foreach ($threadItem->messages as $key => $message) {
+                foreach ($message->payload->parts as $key1 => $payload) {
+                    foreach ($payload->parts as $key2 => $payload1) {
+                        if($payload1->mimeType == "text/html") {
+                            // printPre($threadItem->messages[$key]->payload->parts[$key1]->parts[$key2]);
+                            $threadItem->messages[$key]->payload->parts[$key1]->parts[$key2]->body->data = subImagesInHtml($payload1->body->data, $threadItem->messages[$key]->images);
+                            // printPre($threadItem->messages[$key]->payload->parts[$key1]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // printPre($threadItem);
+
+        return $threadItem;
         // printPre($threadObject);
     }
     catch (Exception $e) {

@@ -91,7 +91,7 @@ if (file_exists($credentialsPath)) {
                 break;
             case 'label':
                 if($method == "list") {
-                    if(isset($_get['extra'])) {
+                    if(isset($_GET['extra'])) {
                         $result = label_list_extra($service, $userId);
                     } else {
                         $result = label_list($service, $userId);

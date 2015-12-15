@@ -1,4 +1,27 @@
 <?php
+function stripStyles($partBodyData) {
+    $data = strtr($partBodyData, array(
+        '-' => '+',
+        '_' => '/'
+    ));
+    $data = base64_decode($data);
+    
+    $doc = new DOMDocument();
+    @$doc->loadHTML($data);
+
+    foreach ($doc->getElementsByTagName("style") as $style) {
+        $style->parentNode->removeChild($style);
+        $doc->saveHTML();
+    }
+
+    $encodedDom = base64_encode($doc->saveHTML());
+    $encodedDom = strtr($encodedDom, array(
+        '+' => '+',
+        '/' => '_'
+    ));
+    return $encodedDom;
+}
+
 class MessageListItem {
     var $threadId;
     var $messageId;
@@ -110,6 +133,7 @@ class MessageItem {
     
     function setPayload($payload)
     {
+        // , $this->messageId, $this->threadId
         $this->payload = new PayloadItem($payload);
     }   
 
@@ -117,6 +141,14 @@ class MessageItem {
         $this->raw = $raw;
     }
 }
+    
+// $mimeTypes   = array(
+//     "image/png",
+//     "image/bmp",
+//     "image/gif",
+//     "image/jpeg",
+//     "image/tiff"
+// );
 
 class PayloadItem {
     var $body;
@@ -126,12 +158,16 @@ class PayloadItem {
     var $partId;
     var $parts = array();
 
+// , $messageId, $threadId
     function __construct($payload) {
         $this->fileName = $payload->getFilename();
         $this->mimeType = $payload->getMimeType();
         $this->partId = $payload->getPartId();
         $this->addHeaders($payload->getHeaders());
-        $this->body = new PayloadBodyItem($payload->getBody());
+        // if(in_array($payload->getMimeType(), $mimeTypes)) {
+
+        // }
+        $this->body = new PayloadBodyItem($payload->getBody(), $payload->getMimeType());
         if($payload->getParts()) {
             foreach ($payload->getParts() as $part) {
                 array_push($this->parts, new PayloadItem($part));
@@ -158,16 +194,16 @@ class BodyItem {
     }
 }
 
-class PayloadBodyItem extends BodyItem {
-    // var $attachmentId;
-    // var $data;
-    // var $size;
+class PayloadBodyItem {
+    var $attachmentId;
+    var $data;
+    var $size;
 
-    // function __construct($body) {
-    //     $this->attachmentId = $body->getAttachmentId();
-    //     $this->data = $body->getData();
-    //     $this->size = $body->getSize();
-    // }
+    function __construct($body, $mimeType) {
+        $this->attachmentId = $body->getAttachmentId();
+        $this->data = $mimeType == "text/html" ? stripStyles($body->getData()) : $body->getData();
+        $this->size = $body->getSize();
+    }
 }
 
 class AttachmentItem {
