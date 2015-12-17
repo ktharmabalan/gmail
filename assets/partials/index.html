@@ -22,10 +22,10 @@
 <div class="container-fluid" ng-controller="mainController">
   <div class="clearfix email-container">
     <div class="col-md-1 label-container">
-      <div class="row">
-        <a class="btn btn-compose col-md-8 col-md-offset-2" href="#">Compose</a>
+      <div class="clearfix">
+        <a class="btn btn-compose col-md-8 col-md-offset-2" href="#/compose">Compose</a>
       </div>
-      <ul class="row">
+      <ul class="clearfix">
         <li ng-repeat="category in categories" ng-click="setSelectedCategory(category)" class="side-label" ng-class="{'selected-side-label': isCategorySelected(category)}"><div>{{ category.name | removeCategory | capitalize }} <span class="badge">{{category.unread}}</span></div></li>
       </ul>
     </div>
@@ -35,11 +35,11 @@
           <li role="presentation" ng-repeat="label in topLabels" ng-click="setSelectedLabel(label)" class="col-md-2 top-label" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }} <span class="badge">{{label.unread}}</span></a></li>
         </ul>
       </div>
-      <div class="row">
+      <div class="clearfix">
         <div class="col-md-4 message-item-container">
            <!-- ng-show="thread.messages[0].labelIds.indexOf(getSelectedLabel()) != -1" -->
           <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'unread': isUnread(thread), 'selected-message-item': isThreadSelected(thread)}">
-            <div class="row">
+            <div class="clearfix">
               <div class="col-md-8">
                   <p>{{ thread.messages[0].payload.headers['From'] | removeEmail }}</p>
               </div>
@@ -47,7 +47,7 @@
                 <p class="pull-right">{{ thread.messages[0].payload.headers['Date'] | date:'MM/dd/yyyy' }}</p>
               </div>
             </div>
-            <div class="row">
+            <div class="clearfix">
               <div class="col-md-10">
                 <p>{{ thread.messages[0].payload.headers['Subject'] }}</p>
               </div>
@@ -91,7 +91,7 @@
                 </div> -->
               </div>
             </div>
-            <!-- <hr> -->
+            <hr ng-if="selectedThread.messages.indexOf(message) !== selectedThread.messages.length - 1 && message.labelIds.indexOf('CHAT')">
           </div>
         </div>
       </div>

@@ -85,10 +85,7 @@
         }
 
         $scope.setSelectedThread = function(thread) {
-            console.log(thread);
-
             if (thread.hasAttachments) {
-                console.log("Has attachments");
                 angular.forEach(thread.messages, function(value, key) {
                     angular.forEach(value.payload.parts, function(value1, key1) {
                         if (value1.partId > 0 && value1.body.attachmentId !== null) {
@@ -103,8 +100,6 @@
                             });
                         }
                     });
-                    // var obj = {'search': 'attachment', 'method': 'get', 'id': value};
-                    // console.log(obj);
                 });
             }
             $scope.selectedThread = thread;
@@ -130,7 +125,6 @@
 
                     if (v.payload.attachmentId !== undefined && v.payload.attachmentId !== null) {
                         v.payload.attachmentId = window.atob(v.payload.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
-                        console.log(value.payload.attachmentId);
                     }
                 }
 
