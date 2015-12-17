@@ -391,12 +391,7 @@ function thread_list($service, $opt_param = array()) {
     $threadsResponse = $service->users_threads->listUsersThreads($user, $opt_param);   
     
     if ($threadsResponse->getThreads()) {
-        $threadObject = new ThreadList();
-
-        foreach ($threadsResponse->getThreads() as $thread) {
-            $threadObject->addThread(new ThreadsSimple($thread->getId(), html_entity_decode($thread->getSnippet())));
-        }
-
+        $threadObject = new ThreadList($threadsResponse);
         return $threadObject;
     }
 }
@@ -525,37 +520,37 @@ function thread_get($service, $userId, $threadId)
     
         $thread   = $service->users_threads->get($user, $threadId);
         $threadItem = new ThreadItem($thread);
-        // return $threadItem;
-        $threadItem->hasAttachments = false;
+        // // return $threadItem;
+        // $threadItem->hasAttachments = false;
 
-        foreach ($threadItem->messages as $key => $message) {
-            $images = [];
-            $image;
+        // foreach ($threadItem->messages as $key => $message) {
+        //     $images = [];
+        //     $image;
 
-            foreach ($message->payload->parts as $payload) {
-                if(in_array($payload->mimeType, $mimeTypes)) {
-                    $image = attachment_get_with_images($service, $userId, $message->messageId, $payload->body->attachmentId, $payload->fileName, $payload->mimeType);
-                    $images[key($image)] = $image[key($image)];
-                }
-            }
-            $threadItem->messages[$key]->images = $images;
-            $threadItem->hasAttachments = true;
-            // printPre($threadItem->messages[$key]->images);
-        }
+        //     foreach ($message->payload->parts as $payload) {
+        //         if(in_array($payload->mimeType, $mimeTypes)) {
+        //             $image = attachment_get_with_images($service, $userId, $message->messageId, $payload->body->attachmentId, $payload->fileName, $payload->mimeType);
+        //             $images[key($image)] = $image[key($image)];
+        //         }
+        //     }
+        //     $threadItem->messages[$key]->images = $images;
+        //     $threadItem->hasAttachments = true;
+        //     // printPre($threadItem->messages[$key]->images);
+        // }
 
-        if($threadItem->hasAttachments) {
-            foreach ($threadItem->messages as $key => $message) {
-                foreach ($message->payload->parts as $key1 => $payload) {
-                    foreach ($payload->parts as $key2 => $payload1) {
-                        if($payload1->mimeType == "text/html") {
-                            // printPre($threadItem->messages[$key]->payload->parts[$key1]->parts[$key2]);
-                            $threadItem->messages[$key]->payload->parts[$key1]->parts[$key2]->body->data = subImagesInHtml($payload1->body->data, $threadItem->messages[$key]->images);
-                            // printPre($threadItem->messages[$key]->payload->parts[$key1]);
-                        }
-                    }
-                }
-            }
-        }
+        // if($threadItem->hasAttachments) {
+        //     foreach ($threadItem->messages as $key => $message) {
+        //         foreach ($message->payload->parts as $key1 => $payload) {
+        //             foreach ($payload->parts as $key2 => $payload1) {
+        //                 if($payload1->mimeType == "text/html") {
+        //                     // printPre($threadItem->messages[$key]->payload->parts[$key1]->parts[$key2]);
+        //                     $threadItem->messages[$key]->payload->parts[$key1]->parts[$key2]->body->data = subImagesInHtml($payload1->body->data, $threadItem->messages[$key]->images);
+        //                     // printPre($threadItem->messages[$key]->payload->parts[$key1]);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         // printPre($threadItem);
 
@@ -645,17 +640,15 @@ function loadPage($title = "Gmail Api")
 
     <script type="text/javascript" src="assets/js/vendor/angular/angular.min.js"></script>
     <script type="text/javascript" src="assets/js/vendor/angular/angular-animate.min.js"></script>
-    <!-- // <script type="text/javascript" src="assets/js/vendor/angular/angular-route.min.js"></script> -->
+    <script type="text/javascript" src="assets/js/vendor/angular/angular-route.min.js"></script>
+    
     <script type="text/javascript" src="assets/js/controller.js"></script>
     <script type="text/javascript" src="assets/js/script.js"></script>
 </head>
 <body>
-  <div class="container-fluid" ng-controller="mainController">
-  <!-- __DIR__ . '/../assets/partials/email.php' -->
   <?php
-    require_once __DIR__ . '/../assets/partials/email.php';
-?>
-  </div>
+    require_once __DIR__ . '/../assets/partials/base.html';
+    ?>
 </body>
 </html>
 <?php

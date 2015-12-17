@@ -45,8 +45,17 @@ class MessageList {
 class ThreadList
 {
     var $threadList = array();
+    var $nextPageToken;
+    var $resultSizeEstimate;
     
-    function __construct() {}
+    function __construct($response) {
+        $this->nextPageToken = $response->getNextPageToken();
+        $this->resultSizeEstimate = $response->getResultSizeEstimate();
+
+        foreach ($response->getThreads() as $thread) {
+            $this->addThread(new ThreadListItem($thread));
+        }
+    }
 
     function addThread($thread)
     {
@@ -78,6 +87,18 @@ class Thread
     }
 }
 
+class ThreadListItem {
+    var $threadId;
+    var $historyId;
+    var $snippet;
+
+    function __construct($thread) {
+        $this->threadId  = $thread->getId();
+        $this->historyId = $thread->getHistoryId();
+        // $this->snippet   = $thread->getSnippet();
+        $this->snippet   = html_entity_decode($thread->getSnippet());
+    }
+}
 class ThreadItem {
     var $threadId;
     var $historyId;
@@ -87,7 +108,8 @@ class ThreadItem {
     function __construct($thread) {
         $this->threadId  = $thread->getId();
         $this->historyId = $thread->getHistoryId();
-        $this->snippet   = $thread->getSnippet();
+        // $this->snippet   = $thread->getSnippet();
+        $this->snippet   = html_entity_decode($thread->getSnippet());
 
         foreach ($thread->getMessages() as $message) {
             $this->addMessage($message);
