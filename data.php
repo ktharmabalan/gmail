@@ -161,92 +161,106 @@ if (file_exists($credentialsPath)) {
         //  ----------------------------------------------
         $userId       = 'me';
         $message = new Google_Service_Gmail_Message();
-        $message->setLabelIds(array('INBOX', 'SENT'));
-        $message->setSnippet('');
-        // $message->setSizeEstimate();
+        // $message->setLabelIds(array('INBOX', 'SENT'));
+        // $message->setSnippet('');
+        // // $message->setSizeEstimate();
 
-        $payload = new Google_Service_Gmail_MessagePart();
-        // $payload->setFilename();
-        $payload->setMimeType('multipart/mixed');
+        // $payload = new Google_Service_Gmail_MessagePart();
+        // // $payload->setFilename();
+        // $payload->setMimeType('multipart/mixed');
 
-        $payloadHeaders = array();
+        // $payloadHeaders = array();
 
-        $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        $payloadHeader->setName('To');
-        $payloadHeader->setValue('25kajan@gmail.com');
-        array_push($payloadHeaders, $payloadHeader);
+        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
+        // $payloadHeader->setName('To');
+        // $payloadHeader->setValue('25kajan@gmail.com');
+        // array_push($payloadHeaders, $payloadHeader);
 
-        $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        $payloadHeader->setName('From');
-        $payloadHeader->setValue('25kajan@gmail.com');
-        array_push($payloadHeaders, $payloadHeader);
+        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
+        // $payloadHeader->setName('From');
+        // $payloadHeader->setValue('25kajan@gmail.com');
+        // array_push($payloadHeaders, $payloadHeader);
 
-        $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        $payloadHeader->setName('Subject');
-        $payloadHeader->setValue('This is the subject');
-        array_push($payloadHeaders, $payloadHeader);
+        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
+        // $payloadHeader->setName('Subject');
+        // $payloadHeader->setValue('This is the subject');
+        // array_push($payloadHeaders, $payloadHeader);
 
-        $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        $payloadHeader->setName('Content-Type');
-        $payloadHeader->setValue('multipart/related');
-        array_push($payloadHeaders, $payloadHeader);
-
-        $payload->setHeaders($payloadHeaders);
-
-        $payloadBody = new Google_Service_Gmail_MessagePartBody();
-        $payload->setBody($payloadBody);
-
-        $payloadParts = array();
-
-        $payloadPart = new Google_Service_Gmail_MessagePart();
-        $payloadPart->setPartId(0);
-        $payloadPart->setMimeType('text/html');
-        // $payloadPart->setFilename();
-
-        $payloadPartHeaders = array();
-        $payloadPartHeader = new Google_Service_Gmail_MessagePartHeader();
-        $payloadPartHeader->setName('Content-Type');
-        $payloadPartHeader->setValue('text/html; charset=utf-8');
-        array_push($payloadPartHeaders, $payloadPartHeader);
-
-        $payloadPartHeader = new Google_Service_Gmail_MessagePartHeader();
-        $payloadPartHeader->setName('Content-Transfer-Encoding');
-        $payloadPartHeader->setValue('base64');
-        array_push($payloadPartHeaders, $payloadPartHeader);
-
-        $payloadPart->setHeaders($payloadPartHeaders);
-
-        $payloadPartsBody = new Google_Service_Gmail_MessagePartBody();
-        // attachmentId 
-        // data
-        // size
-        $payloadPart->setBody($payloadPartsBody);
-
-        array_push($payloadParts, $payloadPart);
-
-        $payload->setParts($payloadParts);
-
+        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
         // $payloadHeader->setName('Content-Type');
-        // // multipart/alternative; boundary=089e0111e0708ed8ae051a04b3e7
-        // $payloadHeader->setValue('multipart/alternative');
-        // $payload->setHeaders(array($payloadHeader));
+        // $payloadHeader->setValue('multipart/related');
+        // array_push($payloadHeaders, $payloadHeader);
+
+        // $payload->setHeaders($payloadHeaders);
+
+        // $payloadBody = new Google_Service_Gmail_MessagePartBody();
+        // $payload->setBody($payloadBody);
+
+        // $payloadParts = array();
+
+        // $payloadPart = new Google_Service_Gmail_MessagePart();
+        // $payloadPart->setPartId(0);
+        // $payloadPart->setMimeType('text/html');
+        // // $payloadPart->setFilename();
+
+        // $payloadPartHeaders = array();
+        // $payloadPartHeader = new Google_Service_Gmail_MessagePartHeader();
+        // $payloadPartHeader->setName('Content-Type');
+        // $payloadPartHeader->setValue('text/html; charset=utf-8');
+        // array_push($payloadPartHeaders, $payloadPartHeader);
+
+        // $payloadPartHeader = new Google_Service_Gmail_MessagePartHeader();
+        // $payloadPartHeader->setName('Content-Transfer-Encoding');
+        // $payloadPartHeader->setValue('base64');
+        // array_push($payloadPartHeaders, $payloadPartHeader);
+
+        // $payloadPart->setHeaders($payloadPartHeaders);
+
+        // $payloadPartsBody = new Google_Service_Gmail_MessagePartBody();
+        // $data = "HELLO WORLD";
+        // $encoded = base64_encode($data);
+        // $encoded = strtr($encoded, array(
+        //     '+' => '+',
+        //     '/' => '_'
+        // ));
+        // $payloadPartsBody->setData($encoded);
+        // // attachmentId 
+        // // data
+        // // size
+        // $payloadPart->setBody($payloadPartsBody);
+
+        // array_push($payloadParts, $payloadPart);
+
+        // $payload->setParts($payloadParts);
+
+        // // $payloadHeader->setName('Content-Type');
+        // // // multipart/alternative; boundary=089e0111e0708ed8ae051a04b3e7
+        // // $payloadHeader->setValue('multipart/alternative');
+        // // $payload->setHeaders(array($payloadHeader));
 
 
 
-            // Payload (Google_Service_Gmail_MessagePart) {
-            //     body (Google_Service_Gmail_MessagePart)
-            //     filename
-            //     headers (Google_Service_Gmail_MessagePartHeader)
-            //     mimeType
-            //     parts (Google_Service_Gmail_MessagePart)
-            //     partId
-            // }
+        //     // Payload (Google_Service_Gmail_MessagePart) {
+        //     //     body (Google_Service_Gmail_MessagePart)
+        //     //     filename
+        //     //     headers (Google_Service_Gmail_MessagePartHeader)
+        //     //     mimeType
+        //     //     parts (Google_Service_Gmail_MessagePart)
+        //     //     partId
+        //     // }
 
-        $message->setPayload($payload);
+        // $message->setPayload($payload);
 
-        // echo "<pre>";
-        // print_r($message);
-        // echo "</pre>";
+        // // echo "<pre>";
+        // // print_r($message);
+        // // echo "</pre>";
+        $data = "HELLO WORLD";
+        $encoded = base64_encode($data);
+        $encoded = strtr($encoded, array(
+            '+' => '+',
+            '/' => '_'
+        ));
+        $message->setRaw();
         send_message($service, $userId, $message);
     }
 }

@@ -2,6 +2,11 @@
 require __DIR__ . '/constants.php';
 require __DIR__ . '/classes.php';
 
+function requestAuthorization() {
+    $client = getClient();
+    return $client->createAuthUrl();
+}
+
 function send_message($service, $userId, $message) {
     try {
         $message = $service->users_messages->send($userId, $message);
@@ -663,4 +668,4 @@ function loadPage($title = "Gmail Api")
 </html>
 <?php
 }
-//require_once __DIR__ . '/../assets/partials/login.php';
+// require_once __DIR__ . '/../assets/partials/login.php';
