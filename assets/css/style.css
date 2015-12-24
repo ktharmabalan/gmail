@@ -148,6 +148,48 @@ div.inbox-nav {
     background-color: #c64333;
 }
 
+label.attach {
+    display: inline-block;
+    padding: 6px 7px;
+    margin: 0;
+    vertical-align: middle;
+}
+
+label.attach:hover {
+    padding: 5px 6px;
+    /*border: 1px solid #f5f5f5;*/
+    vertical-align: middle;
+    border: 1px solid #cfcfcf;
+}
+
+label.attach > i > input[type=file] {
+    display: none;
+}
+
+div.send-toolbar {
+    background-color: #f5f5f5;
+    padding: 5px;
+}
+
+ul.attachment-list {
+    padding: 0;
+}
+
+ul.attachment-list > li {
+    display: inline;
+    padding: 5px 5px 5px 5px;
+}
+
+ul.attachment-list > li > span {
+    display: inline;
+    background-color: #777;
+}
+
+ul.attachment-list > li > span:hover {
+    background-color: #666;
+}
+
+
 /*.top-label {
     opacity: .9;
     -webkit-transition: all 0.3s ease-out;

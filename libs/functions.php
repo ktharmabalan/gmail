@@ -2,6 +2,18 @@
 require __DIR__ . '/constants.php';
 require __DIR__ . '/classes.php';
 
+function message_send() {
+
+}
+
+function profile_get($service, $userId, $optParams = array()) {
+    $profile = $service->users->getProfile($userId, $optParams);
+
+    if ($profile->getEmailAddress()) {
+        return new Profile($profile);
+    }
+}
+
 function requestAuthorization() {
     $client = getClient();
     return $client->createAuthUrl();
@@ -646,7 +658,7 @@ function loadPage($title = "Gmail Api")
     <!-- css -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="assets/css/vendor/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
     
     <!-- javascripts -->

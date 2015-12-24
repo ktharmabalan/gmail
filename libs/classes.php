@@ -22,6 +22,117 @@ function stripStyles($partBodyData) {
     return $encodedDom;
 }
 
+class Profile {
+    var $email;
+    var $threads;
+    var $messages;
+    var $historyId;
+
+    function __construct($profile) {
+        $this->email = $profile->getEmailAddress();
+        $this->historyId = $profile->getHistoryId();
+        $this->messages = $profile->getMessagesTotal();
+        $this->threads = $profile->getThreadsTotal();    
+    }
+}
+
+class MessageSend {
+    var $charset;
+    var $to;
+    var $toEmail;
+    var $cc;
+    var $bcc;
+    var $from;
+    var $fromEmail;
+    var $subject;
+    var $message;
+    var $boundary;
+    var $dateTime;
+    var $attachments;
+
+    function __construct() {
+        $this->charset = 'utf-8';
+        $this->attachments = array();
+        $this->boundary = uniqid(rand(), true);
+        $this->dateTime = date('M d, Y h:i:s A');
+    }
+
+    function formatMessage() {
+        $msg = 'To: =?' . $this->charset . '?B?' . base64_encode($this->to) . '?= <' . $this->toEmail . ">\r\n";
+        $msg .= 'From: =?' . $this->charset . '?B?' . base64_encode($this->from) . '?= <' . $this->fromEmail . ">\r\n";
+        $msg .= 'Subject: =?' . $this->charset . '?B?' . base64_encode($this->subject) . "?=\r\n";
+        $msg .= $this->cc !== null ? 'Cc: =?' . $this->charset . '?B?' . base64_encode($this->cc) . '?= <' . $this->cc . ">\r\n" : '';
+        $msg .= $this->bcc !== null ? 'Bcc: =?' . $this->charset . '?B?' . base64_encode($this->bcc) . '?= <' . $this->bcc . ">\r\n" : '';
+        $msg .= 'MIME-Version: 1.0' . "\r\n";
+        $msg .= 'Content-Type: Multipart/Alternative; boundary="' . $this->boundary . "\"\r\n";
+        
+        // text/plain
+        $msg .= "\r\n--" . $this->boundary . "\r\n";
+        $msg .= 'Content-Type: text/plain; charset=' . $this->charset . "\r\n";
+        // $msg .= 'Content-Transfer-Encoding: 7bit' . '\r\n\r\n';
+        $msg .=  strip_tags($this->message, '') . "\r\n";
+
+        // text/html
+        $msg .= "\r\n--" . $this->boundary . "\r\n";
+        $msg .= 'Content-Type: text/html; charset=' . $this->charset . "\r\n";
+        $msg .= 'Content-Transfer-Encoding: quoted-printable' . "\r\n\r\n";
+        $msg .=  $this->message . "\r\n";
+
+        $msg .= "\r\n--" . $this->boundary . "--\r\n";
+        return $msg;
+    }
+}
+
+/*class MessageSend {
+    var $charset;
+    var $to;
+    var $toEmail;
+    var $from;
+    var $fromEmail;
+    var $subject;
+    var $message;
+    var $date;
+    var $cc;
+    var $bcc;
+
+    function __construct() {
+        $this->date = date('M d, Y h:i:s A');
+        $this->charset = "utf-8";
+    }
+
+    function formatMessage() {
+        $mes = "";
+        $boundary = uniqid(rand(), true);
+        $mes .= 'To: ' . '=?' . $this->charset . '?B?' . base64_encode($this->to) . '?= <' . $this->toEmail . '>' . "\r\n";
+        $mes .= 'From: ' . '=?' . $this->charset . '?B?' . base64_encode($this->from) . '?= <' . $this->fromEmail . '>' . "\r\n";
+        $mes .= $this->cc !== null ? 'Cc: ' . '=?' . $this->charset . '?B?' . base64_encode($this->cc) . '?= <' . $this->cc . '>' . "\r\n" : '';
+        $mes .= $this->bcc !== null ? 'Bcc: ' . '=?' . $this->charset . '?B?' . base64_encode($this->bcc) . '?= <' . $this->bcc . '>' . "\r\n" : '';
+        $mes .= 'Subject: ' . '=?' . $this->charset . '?B?' . base64_encode($this->subject) . '?=' . "\r\n";
+        $mes .= 'MIME-Version: 1.0' . "\r\n";
+        $mes .= 'Content-Type: Multipart/Alternative; boundary="' . $boundary . '"' . "\r\n";
+
+        // start of message
+        // text/plain
+        $mes .= "\r\n--{$boundary}\r\n";
+        $mes .= 'Content-Type: text/plain; charset=' . $this->charset . "\r\n";
+        $mes .= 'Content-Transfer-Encoding: 7bit' . "\r\n\r\n";
+        $mes .= strip_tags($this->message) . "\r\n";
+
+        // text/html
+        $mes .= "\r\n--{$boundary}\r\n";
+        $mes .= 'Content-Type: text/html; charset=' . $this->charset . "\r\n";
+        $mes .= 'Content-Transfer-Encoding: quoted-printable' . "\r\n\r\n";
+        $mes .= $this->message . "\r\n";
+
+        // end of message
+        $mes .= "\r\n--{$boundary}--\r\n";
+        // echo "<pre>";
+        // echo $mes;
+        // echo "</pre>";
+        return rtrim(strstr(base64_encode($mes), '+/', '-_'), "=");
+    }
+}*/
+
 class MessageListItem {
     var $threadId;
     var $messageId;

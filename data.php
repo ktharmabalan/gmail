@@ -108,6 +108,12 @@ if (file_exists($credentialsPath)) {
                         $result = attachment_get($service, $userId, $messageId, $id);
                     }
                 }
+                break;
+            case 'profile':
+                if($method == "get") {
+                    $result = profile_get($service, $userId);
+                }
+                break;
             default:
                 break;
         }
@@ -115,152 +121,91 @@ if (file_exists($credentialsPath)) {
             printPre($result);
         }
     } else if(isset($_GET['send'])) {
-        /*
-            $data = strtr($part, array(
-                '-' => '+',
-                '_' => '/'
-            ));
-            $decoded = base64_decode($data);
-
-            $encoded = base64_encode($data->saveHTML());
-            $encoded = strtr($encoded, array(
-                '+' => '+',
-                '/' => '_'
-            ));
-
-            labelIds (array)
-
-            Message (Google_Service_Gmail_Message) {
-                labelIds (array)
-                payload (Google_Service_Gmail_MessagePart)
-                snippet
-                sizeEstimate
-            }
-
-            Payload (Google_Service_Gmail_MessagePart) {
-                body (Google_Service_Gmail_MessagePart)
-                filename
-                headers (Google_Service_Gmail_MessagePartHeader)
-                mimeType
-                parts (Google_Service_Gmail_MessagePart)
-                partId
-            }
-
-            Body (Google_Service_Gmail_MessagePart) {
-                attachmentId 
-                data
-                size
-            }
-
-            Header (Google_Service_Gmail_MessagePartHeader) {
-                name
-                value
-            }
-        */
-
-        //  ----------------------------------------------
         $userId       = 'me';
-        $message = new Google_Service_Gmail_Message();
-        // $message->setLabelIds(array('INBOX', 'SENT'));
-        // $message->setSnippet('');
-        // // $message->setSizeEstimate();
+    /*
+        $data = strtr($part, array(
+            '-' => '+',
+            '_' => '/'
+        ));
+        $decoded = base64_decode($data);
 
-        // $payload = new Google_Service_Gmail_MessagePart();
-        // // $payload->setFilename();
-        // $payload->setMimeType('multipart/mixed');
-
-        // $payloadHeaders = array();
-
-        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        // $payloadHeader->setName('To');
-        // $payloadHeader->setValue('25kajan@gmail.com');
-        // array_push($payloadHeaders, $payloadHeader);
-
-        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        // $payloadHeader->setName('From');
-        // $payloadHeader->setValue('25kajan@gmail.com');
-        // array_push($payloadHeaders, $payloadHeader);
-
-        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        // $payloadHeader->setName('Subject');
-        // $payloadHeader->setValue('This is the subject');
-        // array_push($payloadHeaders, $payloadHeader);
-
-        // $payloadHeader = new Google_Service_Gmail_MessagePartHeader();
-        // $payloadHeader->setName('Content-Type');
-        // $payloadHeader->setValue('multipart/related');
-        // array_push($payloadHeaders, $payloadHeader);
-
-        // $payload->setHeaders($payloadHeaders);
-
-        // $payloadBody = new Google_Service_Gmail_MessagePartBody();
-        // $payload->setBody($payloadBody);
-
-        // $payloadParts = array();
-
-        // $payloadPart = new Google_Service_Gmail_MessagePart();
-        // $payloadPart->setPartId(0);
-        // $payloadPart->setMimeType('text/html');
-        // // $payloadPart->setFilename();
-
-        // $payloadPartHeaders = array();
-        // $payloadPartHeader = new Google_Service_Gmail_MessagePartHeader();
-        // $payloadPartHeader->setName('Content-Type');
-        // $payloadPartHeader->setValue('text/html; charset=utf-8');
-        // array_push($payloadPartHeaders, $payloadPartHeader);
-
-        // $payloadPartHeader = new Google_Service_Gmail_MessagePartHeader();
-        // $payloadPartHeader->setName('Content-Transfer-Encoding');
-        // $payloadPartHeader->setValue('base64');
-        // array_push($payloadPartHeaders, $payloadPartHeader);
-
-        // $payloadPart->setHeaders($payloadPartHeaders);
-
-        // $payloadPartsBody = new Google_Service_Gmail_MessagePartBody();
-        // $data = "HELLO WORLD";
-        // $encoded = base64_encode($data);
-        // $encoded = strtr($encoded, array(
-        //     '+' => '+',
-        //     '/' => '_'
-        // ));
-        // $payloadPartsBody->setData($encoded);
-        // // attachmentId 
-        // // data
-        // // size
-        // $payloadPart->setBody($payloadPartsBody);
-
-        // array_push($payloadParts, $payloadPart);
-
-        // $payload->setParts($payloadParts);
-
-        // // $payloadHeader->setName('Content-Type');
-        // // // multipart/alternative; boundary=089e0111e0708ed8ae051a04b3e7
-        // // $payloadHeader->setValue('multipart/alternative');
-        // // $payload->setHeaders(array($payloadHeader));
-
-
-
-        //     // Payload (Google_Service_Gmail_MessagePart) {
-        //     //     body (Google_Service_Gmail_MessagePart)
-        //     //     filename
-        //     //     headers (Google_Service_Gmail_MessagePartHeader)
-        //     //     mimeType
-        //     //     parts (Google_Service_Gmail_MessagePart)
-        //     //     partId
-        //     // }
-
-        // $message->setPayload($payload);
-
-        // // echo "<pre>";
-        // // print_r($message);
-        // // echo "</pre>";
-        $data = "HELLO WORLD";
-        $encoded = base64_encode($data);
+        $encoded = base64_encode($data->saveHTML());
         $encoded = strtr($encoded, array(
             '+' => '+',
             '/' => '_'
         ));
-        $message->setRaw();
-        send_message($service, $userId, $message);
+    */
+      
+        $message = new MessageSend();
+        // $message->to = "Kajan";
+        // $message->toEmail = "25kajan@gmail.com";
+        // $message->from = "Kajanthan";
+        // $message->fromEmail = "kajanthan91@hotmail.com";
+        $message->from = "Kajan";
+        $message->fromEmail = "25kajan@gmail.com";
+        $message->to = "Kajanthan";
+        $message->toEmail = "kajanthan91@hotmail.com";
+
+        $message->subject = "Hi this is a test Subject";
+        $message->message = "<div><pre>This is some text inside pre tag</pre></div><p>This is a paragraph.</p>";
+        $message->cc = "kajanthan91@hotmail.com";
+        $message->bcc = "25kajan@gmail.com";
+
+        try {
+            // The message needs to be encoded in Base64URL
+            $mime = rtrim(strtr(base64_encode($message->formatMessage()), '+/', '-_'), '=');
+            $msg = new Google_Service_Gmail_Message();
+            $msg->setRaw($mime);
+            // $objSentMsg = $service->users_messages->send($userId, $msg);
+
+            // print('Message sent object');
+            // print_r($objSentMsg);
+
+        } catch (Exception $e) {
+            print($e->getMessage());
+        } 
+    } else if (isset($_POST)) {
+        $userId       = 'me';
+        // $data = file_get_contents('php://input');
+        // $data = json_decode(file_get_contents('php://input'));
+        // print_r($data);
+        $post = sizeof($_POST) > 0 ? $_POST : [];
+        $files = sizeof($_FILES) > 0 ? $_FILES : [];
+
+        $file = array();
+        for ($i=0; $i < sizeof($files['files'][array_keys($files['files'])[0]]); $i++) {
+            $f = null;
+            foreach ($files['files'] as $key => $value) {
+                $f[$key] = $value[$i];
+            }
+            $file[$i] = $f;
+        }
+        
+        // print_r($post);
+        // print_r($file);
+
+        $message = new MessageSend();
+        // $message->from = "Kajan";
+        // $message->fromEmail = "25kajan@gmail.com";
+        $message->to = $post['to'];
+        $message->toEmail = $post['to'];
+        $message->subject = $post['subject'];
+        $message->message = $post['mes'];
+        $message->cc = $post['cc'];
+        $message->bcc = $post['bcc'];
+
+        try {
+            // The message needs to be encoded in Base64URL
+            $mime = rtrim(strtr(base64_encode($message->formatMessage()), '+/', '-_'), '=');
+            $msg = new Google_Service_Gmail_Message();
+            $msg->setRaw($mime);
+            // $objSentMsg = $service->users_messages->send($userId, $msg);
+
+            // print('Message sent object');
+            // print_r($objSentMsg);
+
+        } catch (Exception $e) {
+            print($e->getMessage());
+        } 
     }
 }

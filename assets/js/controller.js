@@ -320,8 +320,156 @@
         });
     }]);
 
-    app.controller('composeController', ['$scope', function($scope) {
-        
+    app.directive('fileInput', ['$parse', function($parse) {
+        return {
+            restict: 'A',
+            // scope: true,
+            link: function(scope, elem, attrs) {
+                // console.log(elem);
+                elem.bind('change', function() {
+                    $parse(attrs.fileInput).assign(scope, elem[0].files);
+                    scope.$apply();
+                    // console.log(elem[0].files);
+                });
+            }
+        }
+    }]);
+
+    app.filter('ceil', function() {
+      return function(input) {
+        return Math.ceil(input);
+      };
+    });
+
+    app.controller('composeController', ['$scope', '$http', function($scope, $http) {
+        $scope.to = "kajanthan91@hotmail.com";
+        $scope.cc = "25kajan@gmail.com";
+        $scope.bcc = "kajanthan91@hotmail.com";
+        $scope.subject = "This is the subject";
+        $scope.message = "<div><pre><p>This is paragraph</p></pre><script>console.log('Hello World');</script></div>";
+        $scope.files;
+        $scope.response;
+
+/*        $scope.filesChanged = function(elem) {
+            $scope.files = elem.files;
+            $scope.$apply();
+        }*/
+
+        $scope.removeFile = function(file, index) {
+            console.log(index);
+            console.log(file);
+            console.log($scope.files);
+            $scope.files.splice(index, 1);
+
+            // delete $scope.files[file];
+            // delete $scope.files[index];
+            // $scope.files.splice(file);
+
+            // $scope.$on('removeStep', function(event, data) {
+            //   $scope.plan.steps.splice(data, 1);
+            // });
+        };
+
+        // $scope.$watchCollection('files', function (newVal, oldVal) {
+        //     // console.log(newVal, oldVal);
+            
+        // });
+
+        $scope.sendEmail = function() {
+            var fd = new FormData();
+
+            // var files = Object.keys($scope.files).map(function (key) {return $scope.files[key]});
+            angular.forEach($scope.files, function(file){
+                // fd.append('files[]', $scope.files);
+                fd.append('files[]', file);
+            });
+            
+            fd.append('to', $scope.to);
+            fd.append('cc', $scope.cc);
+            fd.append('bcc', $scope.bcc);
+            fd.append('subject', $scope.subject);
+            fd.append('mes', $scope.message);
+
+
+
+            // var data = {
+            //         'to': $scope.to,
+            //         'cc': $scope.cc,
+            //         'bcc': $scope.bcc,
+            //         'subject': $scope.subject,
+            //         'mes': $scope.message
+            //         // ,'files': $scope.files
+            //         ,'files': fd
+            //     };
+
+                $http.post(
+                    '/gmail/data.php',
+                    fd
+                    // {
+                    //     'to': $scope.to,
+                    //     'cc': $scope.cc,
+                    //     'bcc': $scope.bcc,
+                    //     'subject': $scope.subject,
+                    //     'mes': $scope.message
+                    //     // ,'files': $scope.files
+                    //     ,'files': $scope.fd
+                    // }
+                    ,
+                    {
+                        transformRequest:angular.identity(),
+                        // headers:{'Content-Type':'application/x-www-form-urlencoded'}
+                        // headers:{'Content-Type':'multipart/form-data'}
+                        headers:{'Content-Type':undefined}
+                    }
+                )
+                .success(function(d) {
+                    $scope.response = d;
+                    console.log(d);
+                });
+
+
+
+            // $http({
+            //         method: 'POST',
+            //         url: '/gmail/data.php',
+            //         data: {
+            //             'to': $scope.to,
+            //             'cc': $scope.cc,
+            //             'bcc': $scope.bcc,
+            //             'subject': $scope.subject,
+            //             'mes': $scope.message
+            //         },
+            //         headers: {
+            //             'Content-Type': 'application/x-www-form-urlencoded'
+            //         }
+            //     }).success(function(data, status, headers, config) {
+            //         $scope.response = 
+            //         data
+            //         // {
+            //         //     "Response": resp,
+            //         //     "Status": status,
+            //         //     "Headers": headers,
+            //         //     "Config": config
+
+            //         // }
+            //         ;
+            //         console.log($scope.response);
+            //     });
+
+            // var res = $http.post('/gmail/data.php', data).success(function(data, status, headers, config) {
+            //     $scope.response = 
+            //     data
+            //     // {
+            //     //     "Response": resp,
+            //     //     "Status": status,
+            //     //     "Headers": headers,
+            //     //     "Config": config
+
+            //     // }
+            //     ;
+            //     console.log($scope.response);
+            // });
+        };
     }]);
 
     app.config(['$routeProvider', function($routeProvider) {
