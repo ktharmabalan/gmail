@@ -101,6 +101,11 @@ if (file_exists($credentialsPath)) {
                     $result = label_list_extra($service, $userId);
                 }
                 break;
+            case 'category':
+                if($method == "list") {
+                    $result = label_list($service, $userId);
+                }
+                break;
             case 'attachment':
                 if($method == "get") {
                     if(isset($_GET['messageId'])) {
@@ -173,32 +178,33 @@ if (file_exists($credentialsPath)) {
         $files = sizeof($_FILES) > 0 ? $_FILES : [];
 
         $file = array();
-        for ($i=0; $i < sizeof($files['files'][array_keys($files['files'])[0]]); $i++) {
-            $f = null;
-            foreach ($files['files'] as $key => $value) {
-                $f[$key] = $value[$i];
+        if(sizeof($files) > 0) {
+            for ($i=0; $i < sizeof($files['files'][array_keys($files['files'])[0]]); $i++) {
+                $f = null;
+                foreach ($files['files'] as $key => $value) {
+                    $f[$key] = $value[$i];
+                }
+                $file[$i] = $f;
             }
-            $file[$i] = $f;
         }
-        
+
         // print_r($post);
         // print_r($file);
+        
+        // error_reporting(0);
+        $message = new MessageSend($post);
 
-        $message = new MessageSend();
-        // $message->from = "Kajan";
-        // $message->fromEmail = "25kajan@gmail.com";
-        $message->to = $post['to'];
-        $message->toEmail = $post['to'];
-        $message->subject = $post['subject'];
-        $message->message = $post['mes'];
-        $message->cc = $post['cc'];
-        $message->bcc = $post['bcc'];
+        if(sizeof($files) > 0) {
+            $message->setAttachments($file);
+        }
 
         try {
             // The message needs to be encoded in Base64URL
             $mime = rtrim(strtr(base64_encode($message->formatMessage()), '+/', '-_'), '=');
             $msg = new Google_Service_Gmail_Message();
             $msg->setRaw($mime);
+            // echo "\n\r" . strlen($msg->getPayload()) . " - " . strlen($mime);
+
             // $objSentMsg = $service->users_messages->send($userId, $msg);
 
             // print('Message sent object');

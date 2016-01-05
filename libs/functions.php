@@ -669,7 +669,12 @@ function loadPage($title = "Gmail Api")
     <script type="text/javascript" src="assets/js/vendor/angular/angular-animate.min.js"></script>
     <script type="text/javascript" src="assets/js/vendor/angular/angular-route.min.js"></script>
     
-    <script type="text/javascript" src="assets/js/controller.js"></script>
+    <script type="text/javascript" src="assets/js/app.js"></script>
+    <script type="text/javascript" src="assets/js/maincontroller.js"></script>
+    <script type="text/javascript" src="assets/js/composecontroller.js"></script>
+    <script type="text/javascript" src="assets/js/routes.js"></script>
+    <script type="text/javascript" src="assets/js/directives.js"></script>
+    <script type="text/javascript" src="assets/js/filters.js"></script>
     <script type="text/javascript" src="assets/js/script.js"></script>
 </head>
 <body>

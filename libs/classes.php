@@ -49,12 +49,39 @@ class MessageSend {
     var $boundary;
     var $dateTime;
     var $attachments;
+    var $hasAttachments;
+    var $attachmentSize;
+    var $boundary1;
 
-    function __construct() {
+    function __construct($post = []) {
         $this->charset = 'utf-8';
+        $this->hasAttachments = false;
         $this->attachments = array();
         $this->boundary = uniqid(rand(), true);
         $this->dateTime = date('M d, Y h:i:s A');
+        $this->attachmentSize = 0;
+
+        if(sizeof($post) > 0) {
+            // print_r($post['to']);
+
+            // $this->from = "Kajan";
+            // $this->fromEmail = "25kajan@gmail.com";
+            $post['to'] ? $this->to = $post['to'] : '';
+            $post['to'] ? $this->toEmail = $post['to'] : '';
+            $post['subject'] ? $this->subject = $post['subject'] : '';
+            $post['mes'] ? $this->message = $post['mes'] : '';
+            $post['cc'] ? $this->cc = $post['cc'] : '';
+            $post['bcc'] ? $this->bcc = $post['bcc'] : '';
+        }
+    }
+
+    function setAttachments($attachments) {
+        $this->hasAttachments = true;
+        $this->attachments = $attachments;
+        $this->boundary1 = uniqid(rand(), true);
+        // foreach ($attachments as $key => $value) {
+        //     print_r($value);
+        // }
     }
 
     function formatMessage() {
@@ -64,21 +91,51 @@ class MessageSend {
         $msg .= $this->cc !== null ? 'Cc: =?' . $this->charset . '?B?' . base64_encode($this->cc) . '?= <' . $this->cc . ">\r\n" : '';
         $msg .= $this->bcc !== null ? 'Bcc: =?' . $this->charset . '?B?' . base64_encode($this->bcc) . '?= <' . $this->bcc . ">\r\n" : '';
         $msg .= 'MIME-Version: 1.0' . "\r\n";
-        $msg .= 'Content-Type: Multipart/Alternative; boundary="' . $this->boundary . "\"\r\n";
-        
-        // text/plain
+        $msg .= 'Content-Type: Multipart/' . ($this->hasAttachments ? 'mixed' : 'alternative') . '; boundary="' . $this->boundary . "\"\r\n";
+
         $msg .= "\r\n--" . $this->boundary . "\r\n";
+
+        // text/plain
+        $this->hasAttachments ? ($msg .= 'Content-Type: Multipart/alternative; boundary="' . $this->boundary1 . "\"\r\n") . ($msg .= "\r\n--" . $this->boundary1 . "\r\n") : '' ;
         $msg .= 'Content-Type: text/plain; charset=' . $this->charset . "\r\n";
         // $msg .= 'Content-Transfer-Encoding: 7bit' . '\r\n\r\n';
         $msg .=  strip_tags($this->message, '') . "\r\n";
 
         // text/html
-        $msg .= "\r\n--" . $this->boundary . "\r\n";
+        $this->hasAttachments ? $msg .= "\r\n--" . $this->boundary1 . "\r\n" : $msg .= "\r\n--" . $this->boundary . "\r\n";
         $msg .= 'Content-Type: text/html; charset=' . $this->charset . "\r\n";
         $msg .= 'Content-Transfer-Encoding: quoted-printable' . "\r\n\r\n";
         $msg .=  $this->message . "\r\n";
 
+        $this->hasAttachments ? $msg .= "\r\n--" . $this->boundary1 . "--\r\n" : '' ;
+
+        if($this->hasAttachments) {
+            foreach ($this->attachments as $key => $value) {
+                $filePath = $value['tmp_name'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+                $mimeType = finfo_file($finfo, $filePath);
+                $fileName = $value['name'];
+                $fileData = base64_encode(file_get_contents($filePath));
+
+                $msg .= "\r\n--{$this->boundary}\r\n";
+                $msg .= 'Content-Type: '. $mimeType .'; name="'. $fileName .'";' . "\r\n";            
+                // $msg .= 'Content-ID: <' . $strSesFromEmail . '>' . "\r\n";            
+                $msg .= 'Content-Description: ' . $fileName . ';' . "\r\n";
+                $msg .= 'Content-Disposition: attachment; filename="' . $fileName . '"; size=' . filesize($filePath). ';' . "\r\n";
+                $msg .= 'Content-Transfer-Encoding: base64' . "\r\n\r\n";
+                $msg .= chunk_split(base64_encode(file_get_contents($filePath)), 76, "\n") . "\r\n";
+
+                $this->attachmentSize += filesize($filePath);
+            }
+        }
+
         $msg .= "\r\n--" . $this->boundary . "--\r\n";
+
+        echo $msg;
+        // echo $this->attachmentSize;
+        // echo "\r\n" . strlen($msg);
+        // echo "\r\n" . strlen(rtrim(strtr(base64_encode($msg), '+/', '-_'), '='));
+
         return $msg;
     }
 }
