@@ -1,43 +1,69 @@
-<div class="container">
-	<!-- <form enctype="multipart/form-data" ng-submit="sendEmail()"> -->
-	<form ng-submit="sendEmail()">
-	 	<div class="form-group">
-			<input class="form-control" ng-model="to" type="text" placeholder="To">
-		</div>
-		<div class="form-group">
-			<input class="form-control" ng-model="cc"  type="text" placeholder="Cc">
-		</div>
-		<div class="form-group">
-			<input class="form-control" ng-model="bcc"  type="text" placeholder="Bcc">
-		</div>
-		<div class="form-group">
-			<input class="form-control" ng-model="subject"  type="text" placeholder="Subject">
-		</div>
-		<div class="form-group">
-		    <!--<script type="text/javascript" src="assets/js/vendor/nicEdit/nicEdit.js"></script>-->
-		    <!--
-		    <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>
-		    <script type="text/javascript">
-		        bkLib.onDomLoaded(function() { nicEditors.allTextAreas(); console.log("Text areas"); });
-		    </script>
-			-->
-			<textarea class="form-control" ng-model="message" style="height: 100px;"></textarea>
-		</div>
+<div class="container-fluid">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="cancel()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ dataModal.title || "New Message" }}</h4>
+    </div>
+    <div class="modal-body">
+		<!-- <form enctype="multipart/form-data" ng-submit="sendEmail()"> -->
+		<form>
+		 	<div class="form-group">
+				<!-- <input class="form-control" ng-model="to" type="text" placeholder="To"> -->
+				<input class="form-control" ng-model="dataModal.to" type="text" placeholder="To">
+			</div>
+			<div ng-if="data.modalType === 'send'" class="form-group">
+				<!-- <input class="form-control" ng-model="cc"  type="text" placeholder="Cc"> -->
+				<input class="form-control" ng-model="dataModal.cc"  type="text" placeholder="Cc">
+			</div>
+			<div ng-if="data.modalType === 'send'"class="form-group">
+				<!-- <input class="form-control" ng-model="bcc"  type="text" placeholder="Bcc"> -->
+				<input class="form-control" ng-model="dataModal.bcc"  type="text" placeholder="Bcc">
+			</div>
+			<div class="form-group">
+				<!-- <input class="form-control" value="{{ dataModal.subject || 'Subject'}}"  type="text" placeholder="Subject"> -->
+				<input class="form-control" ng-model="dataModal.subject"  type="text" placeholder="Subject">
+			</div>
+<!-- 			<div class="form-group">
+				<textarea class="form-control" value="{{ renderHtml(dataModal.message) || '' }}" style="height: 100px;"></textarea>
+			</div> -->
+			 <!-- ng-bind-html="renderHtml(dataModal.message)" -->
+			<div contenteditable="true" class="form-control message-input" ng-model="dataModal.message.box">
+				<div ng-bind-html="renderHtml(dataModal.message)"></div>
+				<div ng-if="data.message.attachments.length > 0">
+	                <div class="attachment-info">
+	                    <p>{{data.message.attachments.length}} Attachments</p>
+	                </div>
+	                <div class="attachments row">
+	                    <a ng-repeat="attachment in data.message.attachments track by $index" ng-if="attachment.contentDisposition === 'attachment'" href="{{attachment.link}}" download="{{attachment.fileName}}" class="pull-left attachment-box col-md-2">
+	                        <div>
+	                            <div class="file-icon">
+	                                <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+	                            </div>
+	                            <div class="file-name">{{attachment.fileName}}</div>
+	                            <div class="file-size">{{attachment.size | bytes }}</div>
+	                            <div class="download-attachment">
+	                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+	                            </div>
+	                        </div>
+	                    </a>
+	                </div>
+	            </div>
+			</div>
+		</form>
+
+		<!-- <pre>{{response}}</pre> -->
+	</div>
+    <div class="modal-footer">
 		<div class="form-group send-toolbar">
-			<input type="submit" data-tooltip="Send" class="btn btn-primary" value="Submit" />
+			<input type="submit" uib-tooltip="Send" class="btn btn-primary" value="Submit" ng-click="ok()"/>
 			<!--   			<input type="file" ng-model="files" onchange="angular.element(this).scope().filesChanged(this)" multiple/> -->
-  			<!-- <input type="file" file-input="files" multiple /> -->
-  			<label class="attach" data-tooltip="Attach Files" data-toggle="tooltip" data-placement="top" title="Attach Files">
+  			<label class="attach" uib-tooltip="Attach Files">
 				<i class="glyphicon glyphicon-paperclip">
 					<input type="file" file-input="files" multiple />
 				</i>
 			</label>
-			<!-- <i class="glyphicon glyphicon-paperclip pull-right"></i> -->
 		</div>
   		<ul class="attachment-list">
   			<li ng-repeat="file in files"><strong>{{file.name}} ({{file.size/1024 | ceil}}K) <span ng-click="removeFile(file, $index)" class="badge">x</span></strong></li>
-  		<ul>
-	</form>
-
-	<!-- <pre>{{response}}</pre> -->
+  		</ul>
+    </div>
 </div>

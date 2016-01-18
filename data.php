@@ -36,9 +36,9 @@ if (file_exists($credentialsPath)) {
     $client  = getAccessToken($client);
     $service = new Google_Service_Gmail($client);
     $optParams = array();
+    $userId       = 'me';
     
     if (isset($_GET['search'])) {
-        $userId       = 'me';
         $search     = $_GET['search'];
         $method     = $_GET['method'];
 
@@ -126,7 +126,6 @@ if (file_exists($credentialsPath)) {
             printPre($result);
         }
     } else if(isset($_GET['send'])) {
-        $userId       = 'me';
     /*
         $data = strtr($part, array(
             '-' => '+',
@@ -170,48 +169,64 @@ if (file_exists($credentialsPath)) {
             print($e->getMessage());
         } 
     } else if (isset($_POST)) {
-        $userId       = 'me';
-        // $data = file_get_contents('php://input');
-        // $data = json_decode(file_get_contents('php://input'));
-        // print_r($data);
-        $post = sizeof($_POST) > 0 ? $_POST : [];
-        $files = sizeof($_FILES) > 0 ? $_FILES : [];
+        if(isset($_POST['type']) && $_POST['type'] == 'sendMail') {
+            // if($data->type == 'sendMail') 
+            $post = sizeof($_POST) > 0 ? $_POST : [];
+            $files = sizeof($_FILES) > 0 ? $_FILES : [];
 
-        $file = array();
-        if(sizeof($files) > 0) {
-            for ($i=0; $i < sizeof($files['files'][array_keys($files['files'])[0]]); $i++) {
-                $f = null;
-                foreach ($files['files'] as $key => $value) {
-                    $f[$key] = $value[$i];
+            $file = array();
+            if(sizeof($files) > 0) {
+                for ($i=0; $i < sizeof($files['files'][array_keys($files['files'])[0]]); $i++) {
+                    $f = null;
+                    foreach ($files['files'] as $key => $value) {
+                        $f[$key] = $value[$i];
+                    }
+                    $file[$i] = $f;
                 }
-                $file[$i] = $f;
+            }
+
+            print_r($post);
+            print_r($file);
+    
+            // error_reporting(0);
+            /*$message = new MessageSend($post);
+
+            if(sizeof($files) > 0) {
+                $message->setAttachments($file);
+            }
+
+            try {
+                // The message needs to be encoded in Base64URL
+                $mime = rtrim(strtr(base64_encode($message->formatMessage()), '+/', '-_'), '=');
+                $msg = new Google_Service_Gmail_Message();
+                $msg->setRaw($mime);
+                // $msg->setId();
+                // $msg->setThreadId('15231854c99addab');
+                // echo "\n\r" . strlen($msg->getPayload()) . " - " . strlen($mime);
+
+                // $objSentMsg = $service->users_messages->send($userId, $msg);
+
+                // print('Message sent object');
+                // print_r($objSentMsg);
+
+            } catch (Exception $e) {
+                print($e->getMessage());
+            }*/ 
+        } else {
+            $data = json_decode(file_get_contents('php://input'));
+            // print_r($data);     
+            if($data->type == 'modifyLabels') {
+                // echo "HERE";
+                $data = json_decode(file_get_contents('php://input'));
+                // print_r($data);
+                
+                $messageId = $data->messageId;
+                $labelsToAdd = $data->labelsToAdd;
+                $labelsToRemove = $data->labelsToRemove;
+
+                $result = message_label_modify($service, $userId, $messageId, $labelsToAdd, $labelsToRemove);
+                print_r($result);
             }
         }
-
-        // print_r($post);
-        // print_r($file);
-        
-        // error_reporting(0);
-        $message = new MessageSend($post);
-
-        if(sizeof($files) > 0) {
-            $message->setAttachments($file);
-        }
-
-        try {
-            // The message needs to be encoded in Base64URL
-            $mime = rtrim(strtr(base64_encode($message->formatMessage()), '+/', '-_'), '=');
-            $msg = new Google_Service_Gmail_Message();
-            $msg->setRaw($mime);
-            // echo "\n\r" . strlen($msg->getPayload()) . " - " . strlen($mime);
-
-            // $objSentMsg = $service->users_messages->send($userId, $msg);
-
-            // print('Message sent object');
-            // print_r($objSentMsg);
-
-        } catch (Exception $e) {
-            print($e->getMessage());
-        } 
     }
 }

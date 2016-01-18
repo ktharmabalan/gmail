@@ -87,9 +87,23 @@ class MessageSend {
     function formatMessage() {
         $msg = 'To: =?' . $this->charset . '?B?' . base64_encode($this->to) . '?= <' . $this->toEmail . ">\r\n";
         $msg .= 'From: =?' . $this->charset . '?B?' . base64_encode($this->from) . '?= <' . $this->fromEmail . ">\r\n";
-        $msg .= 'Subject: =?' . $this->charset . '?B?' . base64_encode($this->subject) . "?=\r\n";
-        $msg .= $this->cc !== null ? 'Cc: =?' . $this->charset . '?B?' . base64_encode($this->cc) . '?= <' . $this->cc . ">\r\n" : '';
-        $msg .= $this->bcc !== null ? 'Bcc: =?' . $this->charset . '?B?' . base64_encode($this->bcc) . '?= <' . $this->bcc . ">\r\n" : '';
+        // $msg .= 'Subject: =?' . $this->charset . '?B?' . base64_encode($this->subject) . "?=\r\n";
+        // $msg .= $this->cc !== null ? 'Cc: =?' . $this->charset . '?B?' . base64_encode($this->cc) . '?= <' . $this->cc . ">\r\n" : '';
+        // $msg .= $this->bcc !== null ? 'Bcc: =?' . $this->charset . '?B?' . base64_encode($this->bcc) . '?= <' . $this->bcc . ">\r\n" : '';
+
+
+
+        // $threadId   = "";
+        // $messageId  = "";
+        // References + ' ' + MessageID
+        $references = "References: <CAHjsFs-bQvGthhoDYeD9T-pbLOsn-66uCQS8bach+7L3YFh71A@mail.gmail.com>\r\n";
+        $reSubject  = 'Subject: =?' . $this->charset . '?B?' . base64_encode("Fwd:a lot of files") . "?=\r\n";
+        $inReplyTo  = "In-Reply-To: <CAHjsFs-bQvGthhoDYeD9T-pbLOsn-66uCQS8bach+7L3YFh71A@mail.gmail.com>\r\n";
+
+        $msg .= $references;
+        $msg .= $reSubject;
+        $msg .= $inReplyTo;
+
         $msg .= 'MIME-Version: 1.0' . "\r\n";
         $msg .= 'Content-Type: Multipart/' . ($this->hasAttachments ? 'mixed' : 'alternative') . '; boundary="' . $this->boundary . "\"\r\n";
 

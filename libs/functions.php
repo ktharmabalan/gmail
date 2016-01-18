@@ -2,8 +2,18 @@
 require __DIR__ . '/constants.php';
 require __DIR__ . '/classes.php';
 
-function message_send() {
-
+function message_label_modify($service, $userId, $messageId, $labelsToAdd, $labelsToRemove) {
+    $mods = new Google_Service_Gmail_ModifyMessageRequest();
+    $mods->setAddLabelIds($labelsToAdd);
+    $mods->setRemoveLabelIds($labelsToRemove);
+    
+    try {
+        $message = $service->users_messages->modify($userId, $messageId, $mods);
+        // print 'Message with ID: ' . $messageId . ' successfully modified.';
+        return $message;
+    } catch (Exception $e) {
+        print 'An error occurred: ' . $e->getMessage();
+    }    
 }
 
 function profile_get($service, $userId, $optParams = array()) {
@@ -663,15 +673,19 @@ function loadPage($title = "Gmail Api")
     
     <!-- javascripts -->
     <script src="assets/js/vendor/jquery/jquery-2.1.4.min.js"></script>
-    <script src="assets/js/vendor/bootstrap/bootstrap.min.js"></script>
+    <!--<script src="assets/js/vendor/bootstrap/bootstrap.min.js"></script>-->
 
     <script type="text/javascript" src="assets/js/vendor/angular/angular.min.js"></script>
     <script type="text/javascript" src="assets/js/vendor/angular/angular-animate.min.js"></script>
     <script type="text/javascript" src="assets/js/vendor/angular/angular-route.min.js"></script>
+    <!--<script type="text/javascript" src="assets/js/vendor/live.js"></script>-->
     
+    <script src="assets/js/vendor/bootstrap/ui-bootstrap.min.js"></script>
+
     <script type="text/javascript" src="assets/js/app.js"></script>
     <script type="text/javascript" src="assets/js/maincontroller.js"></script>
     <script type="text/javascript" src="assets/js/composecontroller.js"></script>
+    <script type="text/javascript" src="assets/js/usercontroller.js"></script>
     <script type="text/javascript" src="assets/js/routes.js"></script>
     <script type="text/javascript" src="assets/js/directives.js"></script>
     <script type="text/javascript" src="assets/js/filters.js"></script>
@@ -679,7 +693,13 @@ function loadPage($title = "Gmail Api")
 </head>
 <body>
   <?php
-    require_once __DIR__ . '/../assets/partials/base.html';
+    require_once __DIR__ . '/../assets/partials/base.html';   
+    // $file = basename($_SERVER['PHP_SELF']); // your file name 
+    // $last_modified_time = filemtime($file); 
+    // $etag = md5_file($file); 
+
+    // header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified_time)." GMT"); 
+    // header("Etag: $etag"); 
     ?>
 </body>
 </html>

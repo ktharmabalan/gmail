@@ -1,4 +1,4 @@
-app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function($scope, $http, $sce, $filter) {
+app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibModal', function($scope, $http, $sce, $filter, $uibModal) {
     $scope.threadResponse = [];
     $scope.threads = [];
     $scope.selectedThread;
@@ -6,9 +6,27 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
     $scope.topLabels = [];
     $scope.selectedLabel;
     $scope.categories;
+    $scope.categoryList = [];
     $scope.selectedCategory;
     $scope.resultLimits = [10, 15, 20];
     $scope.selectedLimit = $scope.resultLimits[0];
+    $scope.isCategoryCollapsed = true;
+    $scope.isMoreCollapsed = true;
+
+    $scope.collapseMessageBody = function($event, message, index) {
+        if((angular.element("#ignore-click-"+index).find($event.target).length === 0) && (angular.element("#ignore-click-actions-"+index).find($event.target).length === 0)) {
+            message.collapseBody =! message.collapseBody;
+        }
+    }
+
+    $scope.toggleMessageHeaders = function(message) {
+        console.log(message.showHeaders);
+        message.showHeaders=!message.showHeaders;
+    }
+
+    $scope.hideMessageHeaders = function(message) {
+        message.showHeaders=false;
+    }
 
     $scope.isLimitSelected = function(limit) {
         return $scope.selectedLimit === limit;
@@ -23,7 +41,7 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
         };
 
         if ($scope.selectedCategory !== undefined) {
-            if(obj.labelIds !== undefined) {
+            if (obj.labelIds !== undefined) {
                 obj.labelIds = obj.labelIds + "," + $scope.selectedCategory.id;
             } else {
                 obj.labelIds = $scope.selectedCategory.id;
@@ -31,14 +49,13 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
         }
 
         if ($scope.selectedLabel !== undefined) {
-            if(obj.labelIds !== undefined) {
+            if (obj.labelIds !== undefined) {
                 obj.labelIds = obj.labelIds + "," + $scope.selectedLabel.name;
             } else {
                 obj.labelIds = $scope.selectedLabel.name;
             }
         }
 
-        console.log(obj);
         $scope.getData(obj);
     }
 
@@ -54,8 +71,6 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
 
     $scope.setSelectedLabel = function(label) {
         $scope.selectedLabel = label;
-        console.log("Selected Label");
-        console.log($scope.selectedLabel);
 
         var obj = {
             'search': 'thread',
@@ -65,7 +80,6 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
         };
         if ($scope.selectedCategory !== undefined) {
             obj.labelIds = obj.labelIds + "," + $scope.selectedCategory.id;
-            console.log(obj.labelIds);
         }
         $scope.getData(obj);
     }
@@ -75,9 +89,13 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
     }
 
     $scope.setSelectedCategory = function(category) {
-        console.trace();
-        console.log(category);
+        // console.log(category);
         $scope.selectedCategory = category;
+        // console.log(JSON.stringify(category));
+        // console.log(category.messagesTotal);
+        // console.log(category.messagedUnread);
+        // console.log(category.threadsTotal);
+        // console.log(category.threadsUnread);
 
         var obj = {
             'search': 'thread',
@@ -87,7 +105,6 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
         };
         if (category.id === "INBOX" && $scope.selectedLabel !== undefined) {
             obj.labelIds = obj.labelIds + "," + $scope.selectedLabel.name;
-            console.log(obj.labelIds);
         }
         $scope.getData(obj);
     }
@@ -105,7 +122,6 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
     }
 
     $scope.setSelectedThread = function(thread) {
-        console.log("Selected Thread");
         if (thread.hasAttachments) {
             angular.forEach(thread.messages, function(value, key) {
                 angular.forEach(value.payload.parts, function(value1, key1) {
@@ -132,12 +148,16 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
 
     $scope.addToThreads = function(thread) {
         thread.hasAttachments = false;
+        thread.attachments = [];
+
         angular.forEach(thread.messages, function(v, i) {
+            console.log(v);
             v.hasAttachments = false;
             v.attachments = [];
             v.attachmentMap = [];
 
-            v.payload.headers['Date'] = $filter('date')(new Date(v.payload.headers['Date']), 'MM/dd/yy');
+            // v.payload.headers['Date'] = $filter('date')(new Date(v.payload.headers['Date']), 'MM/dd/yy');
+            v.initialSubject = thread.messages[0].payload.headers['Subject'];
 
             if (v.payload.body !== null) {
                 if (v.payload.body.data !== undefined && v.payload.body.data !== null) {
@@ -182,8 +202,13 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
                     }
 
                     if (value1.fileName !== null && value1.fileName !== undefined && value1.fileName !== '') {
-                        v.attachments.push({'fileName': value1.fileName});
+                        v.attachments.push({
+                            'fileName': value1.fileName
+                        });
                         v.hasAttachments = true;
+                        thread.attachments.push({
+                            'fileName': value1.fileName
+                        });
                         thread.hasAttachments = true;
 
                         v.attachmentMap[value1.fileName] = {
@@ -200,8 +225,13 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
                 });
 
                 if (value.fileName !== null && value.fileName !== undefined && value.fileName !== '') {
-                    v.attachments.push({'fileName': value.fileName});
+                    v.attachments.push({
+                        'fileName': value.fileName
+                    });
                     v.hasAttachments = true;
+                    thread.attachments.push({
+                        'fileName': value.fileName
+                    });
                     thread.hasAttachments = true;
 
                     v.attachmentMap[value.fileName] = {
@@ -223,6 +253,10 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
         $scope.setSelectedThread($scope.threads[0]);
     }
 
+    $scope.$watchCollection($scope.threads, function(newCollection, oldCollection, scope) {
+        $scope.threads = $filter('orderObjectBy')($scope.threads, 'messages[0].payload.headers[\'Date\']');
+    });
+
     $scope.renderHtml = function(html_code) {
         return $sce.trustAsHtml(html_code);
     };
@@ -243,13 +277,14 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
                 $scope.selectedThread = null;
                 $scope.clearThreads();
                 $scope.threadResponse = response;
-                angular.forEach(response.threadList, function(value, index) {
+                // angular.forEach(response.threadList, function(value, index) {
                     $scope.getData({
                         search: 'thread',
                         method: 'get',
-                        id: value.threadId
+                        // id: value.threadId,
+                        id: '15231854c99addab'
                     });
-                });
+                // });
             } else if (args['search'] == "thread" && args['method'] == "get") {
                 $scope.addToThreads(response);
             } else if (args['search'] == "label" && args['method'] == "list") {
@@ -263,22 +298,50 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
                         });
                     }
                 });
-                
-                $scope.selectedLabel = $scope.topLabels[0];
-            } else if (args['search'] == "category" && args['method'] == "list") {
-                $scope.categories = response;
 
-                angular.forEach($scope.categories, function(value, key) {
-                    if (value.id == "INBOX") {
-                        $scope.setSelectedCategory($scope.categories[key]);
-                
-                        // $scope.getData({
-                        //     'search': 'label',
-                        //     'method': 'list'
-                        // });
-                    }
+                $scope.selectedLabel = $scope.topLabels[0];
+            } else if (args['search'] == "label" && args['method'] == "get") {
+                $scope.categories.push(response);
+                if (response.id == "INBOX") {
+                    $scope.setSelectedCategory(response);
+
+                    // $scope.getData({
+                    //     'search': 'label',
+                    //     'method': 'list'
+                    // });
+                }
+                // console.log(response);
+            } else if (args['search'] == "category" && args['method'] == "list") {
+                // $scope.categories = response;
+                $scope.categories = [];
+                $scope.categoryList = [];
+
+                // console.log($scope.categories);
+                angular.forEach(response, function(value, key) {
+                    $scope.getData({
+                        'search': 'label',
+                        'method': 'get',
+                        'id': value['id']
+                    });
+                    // console.log(value);
+                    // $scope.categories.push(value);
+                    // if(value['labelListVisibility'] === "labelShow") {
+                    //     console.log(value);
+                    // }
                 });
-                
+
+                // angular.forEach($scope.categories, function(value, key) {
+
+                //     if (value.id == "INBOX") {
+                //         $scope.setSelectedCategory($scope.categories[key]);
+
+                //         // $scope.getData({
+                //         //     'search': 'label',
+                //         //     'method': 'list'
+                //         // });
+                //     }
+                // });
+
                 // $scope.getData({
                 //     'search': 'label',
                 //     'method': 'extra'
@@ -320,13 +383,15 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
                 var re = new RegExp("cid:" + fileName.replace(/\..+/g, ''), "g");
                 var link = 'data:' + mimeType + ';base64,' + response.data.replace(/-/g, '+').replace(/_/g, '/');
 
-                if(attachmentMap['contentDisposition'] === 'INLINE') {
+                if (attachmentMap['contentDisposition'] === 'INLINE') {
                     $scope.threads[threadidx].messages[messageidx].payload.parts[0].parts[htmlidx].body.data = $scope.threads[threadidx].messages[messageidx].payload.parts[0].parts[htmlidx].body.data.replace(re, link);
-                } else if(attachmentMap['contentDisposition'].replace(/;.+/g, '') === 'attachment') {
-                    angular.forEach(message.attachments, function(value, key){
-                        if(value.fileName === fileName) {
+                } else if (attachmentMap['contentDisposition'].replace(/;.+/g, '') === 'attachment') {
+                    angular.forEach(message.attachments, function(value, key) {
+                        if (value.fileName === fileName) {
                             value.link = link;
-                            value.contentDisposition = attachmentMap['contentDisposition'].replace(/;.+/g, '')
+                            value.contentDisposition = attachmentMap['contentDisposition'].replace(/;.+/g, '');
+                            value.size = response.size;
+                            // console.log(value);
                         }
                     });
                     // message.attachments[message.attachments.]
@@ -339,4 +404,54 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', function
         'search': 'category',
         'method': 'list'
     });
+
+    $scope.open = function(type, message, size) {
+        var data = {
+            modalType: type,
+            message: type != 'send' ? message : null
+        };
+
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: './assets/partials/compose.html',
+            controller: 'composeController',
+            size: size,
+            backdrop: 'static'
+                ,
+                resolve: {
+                  data: function () {
+                    return data;
+                  }
+                }
+        });
+
+        modalInstance.result.then(function(response) {
+            console.log(response);
+        }, function() {
+            console.log('Modal dismissed at: ' + new Date());
+        });
+    };
+
+    $scope.modifyLabels = function(messageId, labelsToAdd, labelsToRemove) {
+        // console.log(labelsToAdd);
+        // console.log(labelsToRemove);
+
+        var data = {
+            'type': 'modifyLabels',
+            'messageId': messageId,
+            'labelsToAdd': labelsToAdd !== undefined ? labelsToAdd : [],
+            'labelsToRemove': labelsToRemove !== undefined ? labelsToRemove : []
+        };
+
+        // console.log(data);
+        
+        $http.post(
+            '/gmail/data.php',
+            data
+        )
+        .success(function(d) {
+            $scope.response = d;
+            console.log(d);
+        });
+    };
 }]);

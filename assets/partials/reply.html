@@ -1,0 +1,111 @@
+<!-- <table>
+	<tbody>
+		<tr>
+<td>
+				<a class="btn btn-primary">Icon</a>
+			</td>
+			<td>
+				<form enctype="multipart/form-data" accept-charset="utf-8">
+					<div>
+						<table class="header-border">
+							<tbody>
+								<tr>
+									<td class="reply-options">
+                                        <div class="btn-group" uib-dropdown id="ignore-click-actions-{{$index}}">
+                                            <a class="reply-options-dropdown btn btn-default" uib-dropdown-toggle id="split-button" type="button" class="btn btn-default">
+                                            	<span class="icon-filp glyphicon glyphicon-share-alt"></span>
+                                            	<span class="caret"></span>
+                                            </a>
+                                            <ul uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                                                <li role="menuitem"><a href="#">Reply to {{ "Email From" }}</a></li>
+                                                <li ng-if="$index !== 0" role="menuitem"><a href="#">Reply All</a></li>
+                                                <li role="menuitem"><a href="#">Forward</a></li>
+                                                <li class="divider"></li>
+                                                <li role="menuitem"><a href="#">Edit subject</a></li>
+                                                <li role="menuitem"><a href="#">Pop out reply</a></li>
+                                            </ul>
+                                        </div>
+									</td>
+									<td>
+										<div class="recepients">
+											<table>
+												<tbody>
+													<tr>
+														<td class="recepient-options">To:</td>
+														<td>
+															<div class="recepient-option-to-box">
+																<div class="hide">
+																	<span>
+																		<div>input</div>
+																		<div>x</div>
+																	</span>
+																	<input type="hidden" value="text-entry">
+																</div>
+																<div class="cc-bcc-container" ng-init="message.replyBox.showCC=false; message.replyBox.showBcc=false" ng-if="!message.replyBox.showCc || !message.replyBox.showBcc" class="cc-bcc">
+																	<span ng-if="!message.replyBox.showCc" ng-click="message.replyBox.showCc=true">CC</span>
+																	<span ng-if="!message.replyBox.showBcc" ng-click="message.replyBox.showBcc=true">Bcc</span>
+																</div>
+																<textarea rows="1" class="no-resize recepient-options-to"></textarea>
+															</div>
+														</td>
+													</tr>
+													<tr ng-if="message.replyBox.showCc">
+														<td class="recepient-options">Cc:</td>
+														<td>
+															<textarea rows="1" class="no-resize"></textarea>
+														</td>
+													</tr>
+													<tr ng-if="message.replyBox.showBcc">
+														<td class="recepient-options">Bcc:</td>
+														<td>
+															<textarea rows="1" class="no-resize"></textarea>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</form>
+				<div class="hide">Replies will be sent from {{loggedInUser}}</div>
+				<table class="body-border">
+					<tbody>
+						<tr>
+							<td>
+								<div class="div-content">
+									<textarea>Content HERE</textarea>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div>
+									<table class="footer-border">
+										<tbody>
+											<tr>
+												<td>
+													<div>
+														<input type="submit" uib-tooltip="Send" class="btn btn-primary" value="Send" ng-click="ok()">
+													</div>
+												</td>
+												<td>
+													<div>Attachment</div>
+												</td>
+												<td>
+													<div>Trash</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table> -->

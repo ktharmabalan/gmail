@@ -9,3 +9,27 @@ app.directive('fileInput', ['$parse', function($parse) {
         }
     }
 }]);
+
+app.directive('popupNotFocused', ['$document', '$parse', function($document, $parse) {
+    return {
+        link: function( $scope, $element, $attributes ){
+
+            var scopeExpression = $attributes.popupNotFocused,
+                id = $attributes.referenceId,
+                onDocumentClick = function(event){
+                    var isChild = $element.find(event.target).length > 0;
+
+                    console.log(event.target.id + ", " + id);
+                    if(!isChild && event.target.id !== id) {
+                        $scope.$apply(scopeExpression);
+                    }
+                };
+
+            $document.on("click", onDocumentClick);
+
+            $element.on('$destroy', function() {
+                $document.off("click", onDocumentClick);
+            });
+        }
+    }
+}]);
