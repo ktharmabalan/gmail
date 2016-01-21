@@ -64,8 +64,8 @@ class MessageSend {
         if(sizeof($post) > 0) {
             // print_r($post['to']);
 
-            // $this->from = "Kajan";
-            // $this->fromEmail = "25kajan@gmail.com";
+            $this->from = "Kajan";
+            $this->fromEmail = "25kajan@gmail.com";
             $post['to'] ? $this->to = $post['to'] : '';
             $post['to'] ? $this->toEmail = $post['to'] : '';
             $post['subject'] ? $this->subject = $post['subject'] : '';
@@ -85,12 +85,29 @@ class MessageSend {
     }
 
     function formatMessage() {
-        $msg = 'To: =?' . $this->charset . '?B?' . base64_encode($this->to) . '?= <' . $this->toEmail . ">\r\n";
+        $msg = "";
+        // $msg = "POST https://www.googleapis.com/upload/gmail/v1/users/me/messages/send\n\r";
+        // $msg .= 'Content-Type: Multipart/' . ($this->hasAttachments ? 'mixed' : 'alternative') . '; boundary="' . $this->boundary . "\"\r\n";
+        // $msg .= 'Content-Type: Multipart/' . ($this->hasAttachments ? 'related' : 'alternative') . '; boundary="' . $this->boundary . "\"\r\n";
+        // $msg .= 'MIME-Version: 1.0' . "\r\n";
+
+
+        // $msg .= "\r\n--" . $this->boundary . "\r\n";
+        // $msg .= "Content-Type: message/rfc822;\n\r";
+
+
+
+        $msg .= 'To: =?' . $this->charset . '?B?' . base64_encode($this->to) . '?= <' . $this->toEmail . ">\r\n";
         $msg .= 'From: =?' . $this->charset . '?B?' . base64_encode($this->from) . '?= <' . $this->fromEmail . ">\r\n";
-        // $msg .= 'Subject: =?' . $this->charset . '?B?' . base64_encode($this->subject) . "?=\r\n";
+        $msg .= 'Subject: =?' . $this->charset . '?B?' . base64_encode($this->subject) . "?=\r\n";
+
+/*        $msg .= 'To: ' .$this->toEmail . "\r\n";
+        $msg .= 'From: ' . $this->fromEmail . "\r\n";
+        $msg .= 'Subject: ' . $this->subject . "\r\n";*/
+
+
         // $msg .= $this->cc !== null ? 'Cc: =?' . $this->charset . '?B?' . base64_encode($this->cc) . '?= <' . $this->cc . ">\r\n" : '';
         // $msg .= $this->bcc !== null ? 'Bcc: =?' . $this->charset . '?B?' . base64_encode($this->bcc) . '?= <' . $this->bcc . ">\r\n" : '';
-
 
 
         // $threadId   = "";
@@ -100,12 +117,13 @@ class MessageSend {
         $reSubject  = 'Subject: =?' . $this->charset . '?B?' . base64_encode("Fwd:a lot of files") . "?=\r\n";
         $inReplyTo  = "In-Reply-To: <CAHjsFs-bQvGthhoDYeD9T-pbLOsn-66uCQS8bach+7L3YFh71A@mail.gmail.com>\r\n";
 
-        $msg .= $references;
-        $msg .= $reSubject;
-        $msg .= $inReplyTo;
+        // $msg .= $references;
+        // $msg .= $reSubject;
+        // $msg .= $inReplyTo;
+
 
         $msg .= 'MIME-Version: 1.0' . "\r\n";
-        $msg .= 'Content-Type: Multipart/' . ($this->hasAttachments ? 'mixed' : 'alternative') . '; boundary="' . $this->boundary . "\"\r\n";
+        $msg .= 'Content-Type: Multipart/' . ($this->hasAttachments ? 'related' : 'alternative') . '; boundary="' . $this->boundary . "\"\r\n";
 
         $msg .= "\r\n--" . $this->boundary . "\r\n";
 

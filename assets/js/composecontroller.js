@@ -13,7 +13,6 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
         $scope.dataModal.subject = 'Sample';
         $scope.dataModal.to = '25kajan@gmail.com';
         $scope.dataModal.message = "This is the body content";
-        
     } else if($scope.data.modalType === 'reply') {
         $scope.dataModal.title = 'Reply';
         $scope.dataModal.subject = 'Re: ' + $scope.data.message.initialSubject;
@@ -66,15 +65,6 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
         }
     }
 
-    // console.log($scope.dataModal);
-
-    // $scope.modalInit = function() {
-    //     if($scope.modalType === "send") {
-
-    //     }
-    // };
-
-
     $scope.to = "25kajan@gmail.com";
     // kajanthan91@hotmail.com
     // $scope.cc = "25kajan@gmail.com";
@@ -101,7 +91,6 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
     };
 
     $scope.sendEmail = function() {
-
         // console.log($scope.dataModal.message.box);
         var fd = new FormData();
 
@@ -129,6 +118,7 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
         fd.append('mes', $scope.message);*/
 
         fd.append('to', $scope.dataModal.to);
+        fd.append('from', "25kajan@gmail.com");
         fd.append('cc', $scope.dataModal.cc);
         fd.append('bcc', $scope.dataModal.bcc);
         fd.append('subject', $scope.dataModal.subject);
@@ -155,4 +145,68 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
     $scope.renderHtml = function(html_code) {
         return $sce.trustAsHtml(html_code);
     };
+
+/*    $scope.formatMessage = function(hasAttachments) {
+        var mainBoundary = "__main_boundary__";
+        var attachmentBoundary = "__attachment_boundary__";
+        var charset = "utf-8";
+
+        var msg = "";
+        msg += 'MIME-Version: 1.0' + "\r\n";
+        msg += 'Content-Type: Multipart/' + (hasAttachments ? 'mixed' : 'alternative') + '; boundary="' + mainBoundary + "\"\r\n";
+        // msg = "Content-Type: message/rfc822;\n\r";
+        msg += 'To: =?' + charset + '?B?' + base64_encode($this->to) + '?= <' + $this->toEmail + ">\r\n";
+        msg += 'From: =?' + charset + '?B?' + base64_encode($this->from) + '?= <' + $this->fromEmail + ">\r\n";
+        msg += 'Subject: =?' + charset + '?B?' + base64_encode($this->subject) + "?=\r\n";
+        // msg += $this->cc !== null ? 'Cc: =?' + charset + '?B?' + base64_encode($this->cc) + '?= <' + $this->cc + ">\r\n" : '';
+        // msg += $this->bcc !== null ? 'Bcc: =?' + charset + '?B?' + base64_encode($this->bcc) + '?= <' + $this->bcc + ">\r\n" : '';
+
+        $references = "References: <CAHjsFs-bQvGthhoDYeD9T-pbLOsn-66uCQS8bach+7L3YFh71A@mail.gmail.com>\r\n";
+        $reSubject  = 'Subject: =?' + charset + '?B?' + base64_encode("Fwd:a lot of files") + "?=\r\n";
+        $inReplyTo  = "In-Reply-To: <CAHjsFs-bQvGthhoDYeD9T-pbLOsn-66uCQS8bach+7L3YFh71A@mail.gmail.com>\r\n";
+
+        // msg += $references;
+        // msg += $reSubject;
+        // msg += $inReplyTo;
+
+        msg += "\r\n--" + mainBoundary + "\r\n";
+
+        // text/plain
+        hasAttachments ? (msg += 'Content-Type: Multipart/alternative; boundary="' + attachmentBoundary + "\"\r\n") + (msg += "\r\n--" + attachmentBoundary + "\r\n") : '' ;
+        msg += 'Content-Type: text/plain; charset=' + charset + "\r\n";
+        // msg += 'Content-Transfer-Encoding: 7bit' + '\r\n\r\n';
+        msg +=  strip_tags($this->message, '') + "\r\n";
+
+        // text/html
+        hasAttachments ? msg += "\r\n--" + attachmentBoundary + "\r\n" : msg += "\r\n--" + mainBoundary + "\r\n";
+        msg += 'Content-Type: text/html; charset=' + charset + "\r\n";
+        msg += 'Content-Transfer-Encoding: quoted-printable' + "\r\n\r\n";
+        msg +=  $this->message + "\r\n";
+
+        hasAttachments ? msg += "\r\n--" + attachmentBoundary + "--\r\n" : '' ;
+
+        if(hasAttachments) {
+            foreach ($this->attachments as $key => $value) {
+                $filePath = $value['tmp_name'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+                $mimeType = finfo_file($finfo, $filePath);
+                $fileName = $value['name'];
+                $fileData = base64_encode(file_get_contents($filePath));
+
+                msg += "\r\n--{mainBoundary}\r\n";
+                msg += 'Content-Type: '. $mimeType .'; name="'. $fileName .'";' + "\r\n";            
+                // msg += 'Content-ID: <' + $strSesFromEmail + '>' + "\r\n";            
+                msg += 'Content-Description: ' + $fileName + ';' + "\r\n";
+                msg += 'Content-Disposition: attachment; filename="' + $fileName + '"; size=' + filesize($filePath). ';' + "\r\n";
+                msg += 'Content-Transfer-Encoding: base64' + "\r\n\r\n";
+                msg += chunk_split(base64_encode(file_get_contents($filePath)), 76, "\n") + "\r\n";
+
+                $this->attachmentSize += filesize($filePath);
+            }
+        }
+
+        msg += "\r\n--" + mainBoundary + "--\r\n";
+
+        return msg;
+    }*/
 }]);

@@ -1,6 +1,7 @@
 <?php
 // require __DIR__ . '/libs/constants.php';
 require __DIR__ . '/libs/functions.php';
+// require __DIR__ . '/libs/HttpRequest.php';
 
 if (isset($_GET['code'])) {
     $authCode = trim($_GET['code']);
@@ -169,10 +170,10 @@ if (file_exists($credentialsPath)) {
             print($e->getMessage());
         } 
     } else if (isset($_POST)) {
-        echo "Number of files to upload: " . ini_get('max_file_uploads') . "\n\r";
-        echo "File upload max size " . ini_get('upload_max_filesize') . "\r\n";
-        echo "File upload max size " . file_upload_max_size() . "\r\n";
-        echo "Post max size " . ini_get('post_max_size') . "\n\r";
+        // echo "Number of files to upload: " . ini_get('max_file_uploads') . "\n\r";
+        // echo "File upload max size " . ini_get('upload_max_filesize') . "\r\n";
+        // echo "File upload max size " . file_upload_max_size() . "\r\n";
+        // echo "Post max size " . ini_get('post_max_size') . "\n\r";
 
         // print_r(isset($_POST));
         if(isset($_POST['type']) && $_POST['type'] == 'sendMail') {
@@ -180,12 +181,13 @@ if (file_exists($credentialsPath)) {
             $post = sizeof($_POST) > 0 ? $_POST : [];
             $files = sizeof($_FILES) > 0 ? $_FILES : [];
 
-            echo "Size of files: " . sizeof($files['files'][array_keys($files['files'])[0]]) . "\r\n";
+            // print_r($post);
 
-
-            $file_size = 0;
             $file = array();
             if(sizeof($files) > 0) {
+                $file_size = 0;
+                // echo "Size of files: " . sizeof($files['files'][array_keys($files['files'])[0]]) . "\r\n";
+                
                 for ($i=0; $i < sizeof($files['files'][array_keys($files['files'])[0]]); $i++) {
                     $f = null;
                     foreach ($files['files'] as $key => $value) {
@@ -195,206 +197,135 @@ if (file_exists($credentialsPath)) {
 
                     $file_size += $f['size'];
                 }
+                // print_r($files['files']['size']);
+                // echo "Total file size: " . $file_size . "\r\n";
+                // print_r($file);
             }
 
-            // print_r($files['files']['size']);
-            echo "Total file size: " . $file_size . "\r\n";
-            
-            print_r($post);
-            print_r($file);
-    
             // error_reporting(0);
-            // $message = new MessageSend($post);
+            $message = new MessageSend($post);
 
-            // if(sizeof($files) > 0) {
-            //     $message->setAttachments($file);
-            // }
+            if(sizeof($files) > 0) {
+                $message->setAttachments($file);
+            }
 
             try {
-/*DEFINE("TESTFILE", $file[0]['name']);
-if (!file_exists(TESTFILE)) {
-  $fh = fopen(TESTFILE, 'w');
-  fseek($fh, 1024*1024*20);
-  fwrite($fh, "!", 1);
-  fclose($fh);
-}
-$drive_service = new Google_Service_Drive($client);
-
-  $drive_file = new Google_Service_Drive_DriveFile();
-  $drive_file->title = "Big File";
-  $chunkSizeBytes = 1 * 1024 * 1024;
-
-  // Call the API with the media upload, defer so it doesn't immediately return.
-  $client->setDefer(true);
-  $request = $drive_service->files->insert($drive_file);
-
-  // Create a media file upload to represent our upload process.
-  $media = new Google_Http_MediaFileUpload(
-      $client,
-      $request,
-      'text/plain',
-      null,
-      true,
-      $chunkSizeBytes
-  );
-  $media->setFileSize(filesize(TESTFILE));
-
-  // Upload the various chunks. $status will be false until the process is
-  // complete.
-  $status = false;
-  $handle = fopen(TESTFILE, "rb");
-  while (!$status && !feof($handle)) {
-    // read until you get $chunkSizeBytes from TESTFILE
-    // fread will never return more than 8192 bytes if the stream is read buffered and it does not represent a plain file
-    // An example of a read buffered file is when reading from a URL
-    $chunk = readVideoChunk($handle, $chunkSizeBytes);
-    $status = $media->nextChunk($chunk);
-  }
-
-  // The final value of $status will be the data from the API for the object
-  // that has been uploaded.
-  $result = false;
-  if ($status != false) {
-    $result = $status;
-  }
-
-  fclose($handle);*/
-
-
-/*$drive_service = new Google_Service_Drive($client);
-$drive_file = new Google_Service_Drive_DriveFile();
-$drive_file->title = "Big File";
-$chunkSizeBytes = 1 * 1024 * 1024;
-
-// Call the API with the media upload, defer so it doesn't immediately return.
-$client->setDefer(true);
-$request = $drive_service->files->insert($drive_file);
-
-// Create a media file upload to represent our upload process.
-$media = new Google_Http_MediaFileUpload(
-  $client,
-  $request,
-  'text/plain',
-  null,
-  true,
-  $chunkSizeBytes
-);
-$media->setFileSize(filesize($file[0]['tmp_name']));
-
-// Upload the various chunks. $status will be false until the process is
-// complete.
-$status = false;
-$handle = fopen($file[0]['tmp_name'], "rb");
-while (!$status && !feof($handle)) {
-  $chunk = fread($handle, $chunkSizeBytes);
-  $status = $media->nextChunk($chunk);
- }
-
-// The final value of $status will be the data from the API for the object
-// that has been uploaded.
-$result = false;
-if($status != false) {
-  $result = $status;
-}
-
-fclose($handle);
-// Reset to the client to execute requests immediately in the future.
-$client->setDefer(false);
-
-
-print_r($status);*/
-
-
-
-
-$userId = "me";
-// $method = "POST";
-// $headers = array();
-// $postBody = null;
-// $url = "/upload/gmail/v1/users/{$userId}/messages/send";
-$url = "https://www.googleapis.com/upload/gmail/v1/users/{$userId}/messages/send?uploadType=multipart";
-
-echo $url;
-// $request = new Google_Http_Request($url, $method, $headers, $postBody);
-$request = new Google_Http_Request($url);
-
-echo "failed here";
-$chunkSizeBytes = 1 * 1024 * 1024;
-
-$media = new Google_Http_MediaFileUpload(
-  $client,
-  $request,
-  'text/plain',
-  null,
-  true,
-  $chunkSizeBytes
-);
-echo "failed here1";
-$media->setFileSize(filesize($file[0]['tmp_name']));
-$status = false;
-$handle = fopen($file[0]['tmp_name'], "rb");
-while (!$status && !feof($handle)) {
-  $chunk = fread($handle, $chunkSizeBytes);
-  $status = $media->nextChunk($chunk);
-}
-echo "failed here3";
-print_r($status);
-echo "failed here4";
-
-
-
-
-
-
-
-
-
-
-                /*$this->execute(
-                        'https://www.googleapis.com/upload/gmail/v1/users/' . $this->user_email . '/messages/send?uploadType=media',
-                        'POST',
-                        array(
-                            'Content-Type' => 'message/rfc822'
-                        ),
-                        $data
-                    );*/
-
                 // The message needs to be encoded in Base64URL
                 // $mime = rtrim(strtr(base64_encode($message->formatMessage()), '+/', '-_'), '=');
                 // $msg = new Google_Service_Gmail_Message();
                 // $msg->setRaw($mime);
 
-                // $msg->setId();
+                // $msg->setRaw($message->formatMessage());
+                // echo $mime . "\r\n";
+
                 // $msg->setThreadId('15231854c99addab');
-                // echo "\n\r" . strlen($msg->getPayload()) . " - " . strlen($mime);
+                // echo "\n\r" . strlen($msg->getPayload()) . " - " . strlen($mime) . "\n\r";
 
                 // $objSentMsg = $service->users_messages->send($userId, $msg);
                 // $objSentMsg = $service->users_messages->send($userId, $msg, ['uploadType' => 'multipart']);
 
-/*                $media = new Google_Http_MediaFileUpload(
+                // print('Message sent object');
+                // print_r($objSentMsg);
+
+
+
+
+//--------------------------
+                $options = array(
+                    'Authorization' => "Bearer {$accessToken}",
+                    'Host' => 'www.googleapis.com',
+                    'Content-Type' => 'Content-Type: multipart/related; boundary=foo_bar_baz',
+                    'Content-Length' => 2000000,
+
+                    );
+
+
+                $body = "Content-Type: multipart/mixed; boundary=\"foo_bar_baz\"
+Content-Length: 99999999999999999999999999
+
+--foo_bar_baz
+Content-Type: text/plain; charset=\"UTF-8\"
+
+This is a message just to say hello. So, \"Hello\"
+
+--foo_bar_baz
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=\"anothertest.jpg\"
+Content-Type: message/rfc822;
+
+(image data)
+
+--foo_bar_baz--";
+                $r = http_post_fields('https://www.googleapis.com/upload/gmail/v1/users/{$userId}/messages/send?uploadType=media', $data);
+                // $r = new HttpRequest('https://www.googleapis.com/upload/gmail/v1/users/{$userId}/messages/send?uploadType=media', 'POST', $options);
+                $r->body = $body;
+                // $r->setOptions(
+                //     array(
+                //         'cookies' => array('lang' => 'de'))
+                //     );
+                $result = $r->send();
+                //print out the result
+                print_r($result);
+
+
+
+
+
+
+
+
+
+
+//---------------------------------
+
+
+/*                // Upload to GoogleDrive
+                $drive_service = new Google_Service_Drive($client);
+                $drive_file = new Google_Service_Drive_DriveFile();
+                $drive_file->title = $file[0]['name'];
+                $chunkSizeBytes = 1 * 1024 * 1024;
+
+                // Call the API with the media upload, defer so it doesn't immediately return.
+                $client->setDefer(true);
+                $request = $drive_service->files->insert($drive_file);
+
+                // Create a media file upload to represent our upload process.
+                $media = new Google_Http_MediaFileUpload(
                   $client,
                   $request,
-                  'text/plain',
+                  $file[0]['type'],
                   null,
                   true,
                   $chunkSizeBytes
                 );
+                $media->setFileSize(filesize($file[0]['tmp_name']));
 
-                $media->setFileSize(filesize(TESTFILE));
+                // Upload the various chunks. $status will be false until the process is
+                // complete.
                 $status = false;
-                $handle = fopen(TESTFILE, "rb");
+                $handle = fopen($file[0]['tmp_name'], "rb");
                 while (!$status && !feof($handle)) {
                   $chunk = fread($handle, $chunkSizeBytes);
                   $status = $media->nextChunk($chunk);
-                }*/
+                 }
 
+                // The final value of $status will be the data from the API for the object
+                // that has been uploaded.
+                $result = false;
+                if($status != false) {
+                  $result = $status;
+                }
 
-                // print('Message sent object');
-                // print_r($objSentMsg);
+                fclose($handle);
+                // Reset to the client to execute requests immediately in the future.
+                $client->setDefer(false);
 
+                print_r($status);
+*/ 
             } catch (Exception $e) {
                 print($e->getMessage());
-            } 
+            }
         }
 /*        else {
              // if($_POST['type'] == 'reply' || $_POST['type'] == 'forward')
