@@ -7,6 +7,7 @@ define('CLIENT_SECRET_PATH', __DIR__ . '/../client_secret.json');
 define('SCOPES', implode(' ', array(
   Google_Service_Gmail::GMAIL_READONLY,
   Google_Service_Gmail::GMAIL_SEND,
-  Google_Service_Gmail::GMAIL_MODIFY)
+  Google_Service_Gmail::GMAIL_MODIFY,
+  'https://www.googleapis.com/auth/drive')
 ));
 // define('REDIRECT_URI', 'http://localhost/emailapp/index.php');

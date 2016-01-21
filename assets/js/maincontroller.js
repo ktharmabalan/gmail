@@ -426,7 +426,7 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
         });
 
         modalInstance.result.then(function(response) {
-            console.log(response);
+            // console.log(response);
         }, function() {
             console.log('Modal dismissed at: ' + new Date());
         });

@@ -10,6 +10,10 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
 
     if($scope.data.modalType === 'send') {
         $scope.dataModal.title = 'New Message';
+        $scope.dataModal.subject = 'Sample';
+        $scope.dataModal.to = '25kajan@gmail.com';
+        $scope.dataModal.message = "This is the body content";
+        
     } else if($scope.data.modalType === 'reply') {
         $scope.dataModal.title = 'Reply';
         $scope.dataModal.subject = 'Re: ' + $scope.data.message.initialSubject;
@@ -82,7 +86,7 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
 
     $scope.ok = function() {
         $scope.sendEmail();
-        $uibModalInstance.close();
+        // $uibModalInstance.close();
     };
 
     $scope.cancel = function() {
@@ -105,6 +109,10 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
         angular.forEach($scope.files, function(file) {
             fd.append('files[]', file);
         });
+    
+        if($scope.files !== undefined && $scope.files !== null) {
+            fd.append('numberOfFiles', $scope.files.length);
+        }
 
 /*        angular.forEach($scope.data.message.attachments, function(file){
             // fd.append('files[]', $scope.files);
@@ -113,6 +121,7 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
         });*/
 
         fd.append('type', 'sendMail');
+        // fd.append('purpose', $scope.data.modalType);
 /*        fd.append('to', $scope.to);
         fd.append('cc', $scope.cc);
         fd.append('bcc', $scope.bcc);
@@ -124,9 +133,6 @@ app.controller('composeController', ['$scope', '$http', '$uibModalInstance', '$s
         fd.append('bcc', $scope.dataModal.bcc);
         fd.append('subject', $scope.dataModal.subject);
         fd.append('mes', $scope.dataModal.message);
-
-
-        // console.log(fd);
 
         $http.post(
             '/gmail/data.php',

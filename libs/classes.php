@@ -145,7 +145,7 @@ class MessageSend {
 
         $msg .= "\r\n--" . $this->boundary . "--\r\n";
 
-        echo $msg;
+        // echo $msg;
         // echo $this->attachmentSize;
         // echo "\r\n" . strlen($msg);
         // echo "\r\n" . strlen(rtrim(strtr(base64_encode($msg), '+/', '-_'), '='));
