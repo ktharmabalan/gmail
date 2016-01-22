@@ -1,3 +1,47 @@
+app.directive('loading',   ['$http' ,function ($http) {
+    return {
+        restrict: 'A',
+        link: function (scope, elm, attrs)
+        {
+            scope.isLoading = function () {
+                return $http.pendingRequests.length > 0;
+            };
+
+            scope.$watch(scope.isLoading, function (v)
+            {
+                if(v){
+                    console.log('showing');
+                    elm.show();
+                }else{
+                    console.log('hide');
+                    elm.hide();
+                }
+            });
+        }
+    };
+}]);
+
+app.directive('sideLabels', function() {
+    return {
+        templateUrl: './assets/directives/side_labels.html',
+        replace: true
+    }
+});
+
+app.directive('messageDetails', function() {
+    return {
+        templateUrl: './assets/directives/message_details.html',
+        replace: true
+    }
+});
+
+app.directive('messageList', function() {
+    return {
+        templateUrl: './assets/directives/message_list.html',
+        replace: true
+    }
+});
+
 app.directive('fileInput', ['$parse', function($parse) {
     return {
         restict: 'A',

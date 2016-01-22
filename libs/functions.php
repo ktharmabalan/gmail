@@ -187,7 +187,6 @@ function label_list_extra($service, $userId)
 }
 
 function label_list($service, $userId, $opt_param = array()) {
-{
     $labels = array();
     
     $labelsResponse = $service->users_labels->listUsersLabels($userId);
@@ -210,7 +209,6 @@ function label_list($service, $userId, $opt_param = array()) {
     }
 
     return $labelsList;
-}
 }
 
 /**
@@ -669,7 +667,7 @@ function loadPage($title = "Gmail Api")
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="assets/css/vendor/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     
     <!-- javascripts -->
     <script src="assets/js/vendor/jquery/jquery-2.1.4.min.js"></script>
@@ -689,6 +687,7 @@ function loadPage($title = "Gmail Api")
     <script type="text/javascript" src="assets/js/routes.js"></script>
     <script type="text/javascript" src="assets/js/directives.js"></script>
     <script type="text/javascript" src="assets/js/filters.js"></script>
+    <script type="text/javascript" src="assets/js/providers.js"></script>
     <script type="text/javascript" src="assets/js/script.js"></script>
 </head>
 <body>

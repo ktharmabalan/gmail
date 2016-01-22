@@ -1,0 +1,58 @@
+<div class="col-md-1 label-container">
+    <div class="clearfix">
+        <!-- <a class="btn btn-compose" href="#/compose">Compose</a> -->
+        <a class="btn btn-compose" ng-click="open({type: 'send'})">Compose</a>
+    </div>
+    <ul class="clearfix">
+        <li ng-repeat="category in categories" ng-if="category.name.indexOf('CATEGORY_') === -1 && category['labelListVisibility'] === 'labelShow'" ng-click="setSelectedCategory(category)" class="side-label clearfix" ng-class="{'selected-side-label': isCategorySelected(category)}">
+            <div ng-init="parentHover=false" ng-class="{'hover-color': parentHover}" class="clearfix">
+                <div class="col-md-1"></div>
+                <!-- ng-class="{'hover-color': parentHover}" -->
+                <div class="col-md-11" ng-mouseenter="parentHover=true" ng-mouseleave="parentHover=false">
+                    {{ category.name | removeCategory | capitalize }} <span ng-if="category['threadsUnread'] > 0" class="badge pull-right">{{category.threadsUnread}}</span>
+                </div>
+            </div>
+        </li>
+        <!-- Categories -->
+        <li class="side-label" ng-class="{'selected-side-label': isCategorySelected('category')}" ng-click="setSelectedCategory('category')">
+            <div ng-init="categoryHover=false" ng-class="{'hover-color': categoryHover}" class="clearfix">
+                <div ng-init="childCategoryHover=false" class="col-md-1" ng-class="{'hover-color': childCategoryHover}" ng-mouseenter="childCategoryHover=true" ng-mouseleave="childCategoryHover=false">
+                    <i class="glyphicon" ng-class="{'glyphicon-triangle-bottom': !isCategoryCollapsed, 'glyphicon-triangle-right': isCategoryCollapsed}" ng-click="isCategoryCollapsed = !isCategoryCollapsed"></i>
+                </div>
+                <div class="col-md-11" ng-mouseenter="categoryHover=true" ng-mouseleave="categoryHover=false">
+                    <strong>Categories</strong>
+                </div>
+            </div>
+        </li>
+        <li uib-collapse="isCategoryCollapsed">
+            <ul class="clearfix">
+                <li ng-repeat="category in categories" ng-if="category.name.indexOf('CATEGORY_') !== -1 && category['labelListVisibility'] === 'labelShow'" ng-click="setSelectedCategory(category)" class="side-label clearfix" ng-class="{'selected-side-label': isCategorySelected(category)}">
+                    <div ng-init="parentHover=false" ng-class="{'hover-color': parentHover}" class="clearfix">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-11" ng-mouseenter="parentHover=true" ng-mouseleave="parentHover=false">{{ category.name | removeCategory | capitalize }} <span ng-if="category['threadsUnread'] > 0" class="badge pull-right">{{category.threadsUnread}}</span></div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        <!-- More -->
+        <li class="side-label" ng-click="isMoreCollapsed = !isMoreCollapsed; more=(more === 'More' ? 'Less' : 'More')">
+            <div ng-init="moreHover=false" ng-class="{'more-underline': !isMoreCollapsed, 'hover-color': moreHover}" class="clearfix">
+                <div class="col-md-1"></div>
+                <div class="col-md-10" ng-init="more='More'" ng-mouseenter="moreHover=true" ng-mouseleave="moreHover=false">{{more}}</div>
+                <div class="col-md-1">
+                    <i class="glyphicon" ng-class="{'glyphicon-triangle-bottom': isMoreCollapsed, 'glyphicon-triangle-top': !isMoreCollapsed}"></i>
+                </div>
+            </div>
+        </li>
+        <li uib-collapse="isMoreCollapsed">
+            <ul class="clearfix">
+                <li ng-repeat="category in categories" ng-if="category.name.indexOf('CATEGORY_') === -1 && category['labelListVisibility'] === 'labelHide'" ng-click="setSelectedCategory(category)" class="side-label clearfix" ng-class="{'selected-side-label': isCategorySelected(category)}">
+                    <div ng-init="parentHover=false" ng-class="{'hover-color': parentHover}" class="clearfix">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-11" ng-mouseenter="parentHover=true" ng-mouseleave="parentHover=false">{{ category.name | removeCategory | capitalize }} <span ng-if="category['threadsUnread'] > 0" class="badge pull-right">{{category.threadsUnread}}</span></div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

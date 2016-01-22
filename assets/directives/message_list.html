@@ -1,0 +1,26 @@
+<div class="col-md-4 message-item-container">
+<!--     ng-show="thread.messages[thread.messages.length - 1].labelIds.indexOf(getSelectedLabel()) != -1" | orderObjectBy:'threads:threadId.messages[0].payload.headers[\'Date\']' -->
+    <div ng-repeat="thread in threads" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'unread': isUnread(thread), 'selected-message-item': isThreadSelected(thread)}">
+        <input class="message-select-check" type="checkbox" aria-label="...">
+        <div class="message-item-info">
+            <div class="clearfix">
+                <div class="col-md-8">
+                    <p class="email-from">{{ thread.messages[thread.messages.length - 1].payload.headers['From'] | removeEmail | removeSpace | removeQuotes | removeSpace }}</p>
+                </div>
+                <div class="col-md-4">
+<!--                     <p class="pull-right">{{ thread.messages[thread.messages.length - 1].payload.headers['Date'] | date:'MM/dd/yyyy' }}</p>
+                    <p class="email-date pull-right">{{ thread.messages[thread.messages.length - 1].payload.headers['Date'] | date:'yyyy-MM-dd HH:mm:ss Z' }}</p> -->
+                    <p class="email-date pull-right">{{ thread.messages[thread.messages.length - 1].payload.headers['Date'] | displayDate }}</p>
+                </div>
+            </div>
+            <div class="clearfix">
+                <div class="col-md-10">
+                    <p class="email-subject">{{ thread.messages[thread.messages.length - 1].payload.headers['Subject'] }}</p>
+                </div>
+                <div class="col-md-2" ng-if="thread.hasAttachments" title="{{ thread.attachments | joinNames }}">
+                    <i class="glyphicon glyphicon-paperclip pull-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

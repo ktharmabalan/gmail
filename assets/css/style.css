@@ -16,6 +16,23 @@
     transform: scale(-1, 1);
 }
 
+#loading-spinner {
+    z-index: 100;
+    width: 80%;
+    height: 100%;
+    position: absolute;
+}
+
+#loading-spinner > i {
+    position: relative;
+    top: 50%;
+    bottom: 50%;
+    right: 50%;
+    left: 50%;
+    margin: 0 auto;
+    font-size: 50px;
+}
+
 /* Div */
 .div-center {
     min-height: 100%;

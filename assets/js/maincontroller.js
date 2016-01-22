@@ -1,4 +1,4 @@
-app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibModal', function($scope, $http, $sce, $filter, $uibModal) {
+app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibModal', 'mailProvider', function($scope, $http, $sce, $filter, $uibModal, mailProvider) {
     $scope.threadResponse = [];
     $scope.threads = [];
     $scope.selectedThread;
@@ -6,12 +6,15 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
     $scope.topLabels = [];
     $scope.selectedLabel;
     $scope.categories;
-    $scope.categoryList = [];
     $scope.selectedCategory;
     $scope.resultLimits = [10, 15, 20];
     $scope.selectedLimit = $scope.resultLimits[0];
     $scope.isCategoryCollapsed = true;
     $scope.isMoreCollapsed = true;
+
+    $scope.display = function(displayContent) {
+        console.log(displayContent);
+    }
 
     $scope.collapseMessageBody = function($event, message, index) {
         if((angular.element("#ignore-click-"+index).find($event.target).length === 0) && (angular.element("#ignore-click-actions-"+index).find($event.target).length === 0)) {
@@ -35,9 +38,10 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
     $scope.limitChanged = function() {
         var obj = {
             'search': 'thread',
-            'method': 'list',
+            'method': 'list'
+            // ,
             // 'labelIds': $scope.selectedLabel.name,
-            'maxResults': $scope.selectedLimit
+            // 'maxResults': $scope.selectedLimit
         };
 
         if ($scope.selectedCategory !== undefined) {
@@ -75,8 +79,9 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
         var obj = {
             'search': 'thread',
             'method': 'list',
-            'labelIds': label.name,
-            'maxResults': $scope.selectedLimit
+            'labelIds': label.name
+            // ,
+            // 'maxResults': $scope.selectedLimit
         };
         if ($scope.selectedCategory !== undefined) {
             obj.labelIds = obj.labelIds + "," + $scope.selectedCategory.id;
@@ -100,8 +105,9 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
         var obj = {
             'search': 'thread',
             'method': 'list',
-            'labelIds': category.id,
-            'maxResults': $scope.selectedLimit
+            'labelIds': category.id
+            // ,
+            // 'maxResults': $scope.selectedLimit
         };
         if (category.id === "INBOX" && $scope.selectedLabel !== undefined) {
             obj.labelIds = obj.labelIds + "," + $scope.selectedLabel.name;
@@ -151,101 +157,107 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
         thread.attachments = [];
 
         angular.forEach(thread.messages, function(v, i) {
-            console.log(v);
-            v.hasAttachments = false;
-            v.attachments = [];
-            v.attachmentMap = [];
+/*            if(v.labelIds.indexOf('TRASH') === -1) {
+                thread.messages.splice(i);
+                console.log(v.labelIds.indexOf('TRASH'));
+                // console.log(v.labelIds);
+            } else if(v.labelIds.indexOf('TRASH') !== -1) {*/
+                v.hasAttachments = false;
+                v.attachments = [];
+                v.attachmentMap = [];
+                v.idx = thread.messages.indexOf(v); //i;
 
-            // v.payload.headers['Date'] = $filter('date')(new Date(v.payload.headers['Date']), 'MM/dd/yy');
-            v.initialSubject = thread.messages[0].payload.headers['Subject'];
+                // v.payload.headers['Date'] = $filter('date')(new Date(v.payload.headers['Date']), 'MM/dd/yy');
+                v.initialSubject = thread.messages[0].payload.headers['Subject'];
 
-            if (v.payload.body !== null) {
-                if (v.payload.body.data !== undefined && v.payload.body.data !== null) {
-                    v.payload.body.data = window.atob(v.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-                }
-
-                if (v.payload.attachmentId !== undefined && v.payload.attachmentId !== null) {
-                    v.payload.attachmentId = window.atob(v.payload.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
-                }
-            }
-
-            // if (v.payload.fileName !== null && v.payload.fileName !== undefined && v.payload.fileName !== '') {
-            //     v.attachments.push({'fileName': v.payload.fileName});
-            //     v.hasAttachments = true;
-            //     thread.hasAttachments = true;
-            // }
-
-            angular.forEach(v.payload.parts, function(value, key) {
-                if (value.body !== null) {
-                    if (value.body.data !== undefined && value.body.data !== null) {
-                        value.body.data = window.atob(value.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                if (v.payload.body !== null) {
+                    if (v.payload.body.data !== undefined && v.payload.body.data !== null) {
+                        v.payload.body.data = window.atob(v.payload.body.data.replace(/-/g, '+').replace(/_/g, '/'));
                     }
 
-                    if (value.body.attachmentId !== undefined && value.body.attachmentId !== null) {
-                        // value.body.attachmentId = window.atob(value.body.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
+                    if (v.payload.attachmentId !== undefined && v.payload.attachmentId !== null) {
+                        v.payload.attachmentId = window.atob(v.payload.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
                     }
                 }
 
-                angular.forEach(value.parts, function(value1, key1) {
-                    if (value1.body !== null) {
-                        if (value1.body.data !== undefined && value1.body.data !== null) {
-                            value1.body.data = window.atob(value1.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                // if (v.payload.fileName !== null && v.payload.fileName !== undefined && v.payload.fileName !== '') {
+                //     v.attachments.push({'fileName': v.payload.fileName});
+                //     v.hasAttachments = true;
+                //     thread.hasAttachments = true;
+                // }
+
+                angular.forEach(v.payload.parts, function(value, key) {
+                    if (value.body !== null) {
+                        if (value.body.data !== undefined && value.body.data !== null) {
+                            value.body.data = window.atob(value.body.data.replace(/-/g, '+').replace(/_/g, '/'));
                         }
 
-                        if (value1.attachmentId !== undefined && value1.attachmentId !== null) {
-                            value1.attachmentId = window.atob(value1.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
+                        if (value.body.attachmentId !== undefined && value.body.attachmentId !== null) {
+                            // value.body.attachmentId = window.atob(value.body.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
                         }
                     }
 
-                    if (value1.mimeType === "text/html") {
-                        htmlidx = key1;
-                    }
+                    angular.forEach(value.parts, function(value1, key1) {
+                        if (value1.body !== null) {
+                            if (value1.body.data !== undefined && value1.body.data !== null) {
+                                value1.body.data = window.atob(value1.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                            }
 
-                    if (value1.fileName !== null && value1.fileName !== undefined && value1.fileName !== '') {
+                            if (value1.attachmentId !== undefined && value1.attachmentId !== null) {
+                                value1.attachmentId = window.atob(value1.attachmentId.replace(/-/g, '+').replace(/_/g, '/'));
+                            }
+                        }
+
+                        if (value1.mimeType === "text/html") {
+                            htmlidx = key1;
+                        }
+
+                        if (value1.fileName !== null && value1.fileName !== undefined && value1.fileName !== '') {
+                            v.attachments.push({
+                                'fileName': value1.fileName
+                            });
+                            v.hasAttachments = true;
+                            thread.attachments.push({
+                                'fileName': value1.fileName
+                            });
+                            thread.hasAttachments = true;
+
+                            v.attachmentMap[value1.fileName] = {
+                                attachmentId: value1.body.attachmentId,
+                                contentDisposition: value1.headers['Content-Disposition'],
+                                partId: value1.partId,
+                                mimeType: value1.mimeType,
+                                cid: $filter('removeArrows')(value1.headers['Content-ID']),
+                                messageidx: i,
+                                partsidx: key1,
+                                htmlidx: htmlidx
+                            };
+                        }
+                    });
+
+                    if (value.fileName !== null && value.fileName !== undefined && value.fileName !== '') {
                         v.attachments.push({
-                            'fileName': value1.fileName
+                            'fileName': value.fileName
                         });
                         v.hasAttachments = true;
                         thread.attachments.push({
-                            'fileName': value1.fileName
+                            'fileName': value.fileName
                         });
                         thread.hasAttachments = true;
 
-                        v.attachmentMap[value1.fileName] = {
-                            attachmentId: value1.body.attachmentId,
-                            contentDisposition: value1.headers['Content-Disposition'],
-                            partId: value1.partId,
-                            mimeType: value1.mimeType,
-                            cid: $filter('removeArrows')(value1.headers['Content-ID']),
+                        v.attachmentMap[value.fileName] = {
+                            attachmentId: value.body.attachmentId,
+                            contentDisposition: value.headers['Content-Disposition'],
+                            partId: value.partId,
+                            mimeType: value.mimeType,
+                            cid: $filter('removeArrows')(value.headers['Content-ID']),
                             messageidx: i,
-                            partsidx: key1,
+                            partsidx: key,
                             htmlidx: htmlidx
                         };
                     }
                 });
-
-                if (value.fileName !== null && value.fileName !== undefined && value.fileName !== '') {
-                    v.attachments.push({
-                        'fileName': value.fileName
-                    });
-                    v.hasAttachments = true;
-                    thread.attachments.push({
-                        'fileName': value.fileName
-                    });
-                    thread.hasAttachments = true;
-
-                    v.attachmentMap[value.fileName] = {
-                        attachmentId: value.body.attachmentId,
-                        contentDisposition: value.headers['Content-Disposition'],
-                        partId: value.partId,
-                        mimeType: value.mimeType,
-                        cid: $filter('removeArrows')(value.headers['Content-ID']),
-                        messageidx: i,
-                        partsidx: key,
-                        htmlidx: htmlidx
-                    };
-                }
-            });
+            // }
         });
 
         // thread.messages.reverse();
@@ -271,6 +283,8 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
         }
 
         url += '&maxResults=' + $scope.selectedLimit;
+
+        $scope.canceler = $q.defer();
 
         $http.get(url).success(function(response) {
             if (args['search'] == "thread" && args['method'] == "list") {
@@ -312,17 +326,21 @@ app.controller('mainController', ['$scope', '$http', '$sce', '$filter', '$uibMod
                 }
                 // console.log(response);
             } else if (args['search'] == "category" && args['method'] == "list") {
-                // $scope.categories = response;
                 $scope.categories = [];
-                $scope.categoryList = [];
+                $scope.categories = response;
 
+                // console.log(response);
                 // console.log($scope.categories);
                 angular.forEach(response, function(value, key) {
-                    $scope.getData({
-                        'search': 'label',
-                        'method': 'get',
-                        'id': value['id']
-                    });
+                    if (value.id === "INBOX") {
+                        // console.log("Select Inbox");
+                        $scope.setSelectedCategory(value);
+                    }
+                    // $scope.getData({
+                    //     'search': 'label',
+                    //     'method': 'get',
+                    //     'id': value['id']
+                    // });
                     // console.log(value);
                     // $scope.categories.push(value);
                     // if(value['labelListVisibility'] === "labelShow") {

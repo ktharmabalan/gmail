@@ -1,3 +1,8 @@
+<!-- <div id="loading-spinner" loading>
+    <i class="fa fa-spinner fa-spin"></i>
+    <i class="glyphicon glyphicon-repeat"></i>
+</div> -->
+
 <div class="row navbar-form">
     <div class="pull-left">
         <div class="input-group">
@@ -19,234 +24,18 @@
 </div>
 <div class="container-fluid">
     <div class="clearfix email-container">
-        <div class="col-md-1 label-container">
-            <div class="clearfix">
-                <!-- <a class="btn btn-compose" href="#/compose">Compose</a> -->
-                <a class="btn btn-compose" ng-click="open('send')">Compose</a>
-            </div>
-            <ul class="clearfix">
-                <li ng-repeat="category in categories track by $index" ng-if="category.name.indexOf('CATEGORY_') === -1 && category['labelListVisibility'] === 'labelShow'" ng-click="setSelectedCategory(category)" class="side-label clearfix" ng-class="{'selected-side-label': isCategorySelected(category)}">
-                    <div ng-init="parentHover=false" ng-class="{'hover-color': parentHover}" class="clearfix">
-                        <div class="col-md-1"></div>
-                        <!-- ng-class="{'hover-color': parentHover}" -->
-                        <div class="col-md-11" ng-mouseenter="parentHover=true" ng-mouseleave="parentHover=false">
-                            {{ category.name | removeCategory | capitalize }} <span ng-if="category['threadsUnread'] > 0" class="badge pull-right">{{category.threadsUnread}}</span>
-                        </div>
-                    </div>
-                </li>
-                <!-- Categories -->
-                <li class="side-label" ng-class="{'selected-side-label': isCategorySelected('category')}" ng-click="setSelectedCategory('category')">
-                    <div ng-init="categoryHover=false" ng-class="{'hover-color': categoryHover}" class="clearfix">
-                        <div ng-init="childCategoryHover=false" class="col-md-1" ng-class="{'hover-color': childCategoryHover}" ng-mouseenter="childCategoryHover=true" ng-mouseleave="childCategoryHover=false">
-                            <i class="glyphicon" ng-class="{'glyphicon-triangle-bottom': !isCategoryCollapsed, 'glyphicon-triangle-right': isCategoryCollapsed}" ng-click="isCategoryCollapsed = !isCategoryCollapsed"></i>
-                        </div>
-                        <div class="col-md-11" ng-mouseenter="categoryHover=true" ng-mouseleave="categoryHover=false">
-                            <strong>Categories</strong>
-                        </div>
-                    </div>
-                </li>
-                <li uib-collapse="isCategoryCollapsed">
-                    <ul class="clearfix">
-                        <li ng-repeat="category in categories track by $index" ng-if="category.name.indexOf('CATEGORY_') !== -1 && category['labelListVisibility'] === 'labelShow'" ng-click="setSelectedCategory(category)" class="side-label clearfix" ng-class="{'selected-side-label': isCategorySelected(category)}">
-                            <div ng-init="parentHover=false" ng-class="{'hover-color': parentHover}" class="clearfix">
-                                <div class="col-md-1"></div>
-                                <div class="col-md-11" ng-mouseenter="parentHover=true" ng-mouseleave="parentHover=false">{{ category.name | removeCategory | capitalize }} <span ng-if="category['threadsUnread'] > 0" class="badge pull-right">{{category.threadsUnread}}</span></div>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-                <!-- More -->
-                <li class="side-label" ng-click="isMoreCollapsed = !isMoreCollapsed; more=(more === 'More' ? 'Less' : 'More')">
-                    <div ng-init="moreHover=false" ng-class="{'more-underline': !isMoreCollapsed, 'hover-color': moreHover}" class="clearfix">
-                        <div class="col-md-1"></div>
-                        <div class="col-md-10" ng-init="more='More'" ng-mouseenter="moreHover=true" ng-mouseleave="moreHover=false">{{more}}</div>
-                        <div class="col-md-1">
-                            <i class="glyphicon" ng-class="{'glyphicon-triangle-bottom': isMoreCollapsed, 'glyphicon-triangle-top': !isMoreCollapsed}"></i>
-                        </div>
-                    </div>
-                </li>
-                <li uib-collapse="isMoreCollapsed">
-                    <ul class="clearfix">
-                        <li ng-repeat="category in categories track by $index" ng-if="category.name.indexOf('CATEGORY_') === -1 && category['labelListVisibility'] === 'labelHide'" ng-click="setSelectedCategory(category)" class="side-label clearfix" ng-class="{'selected-side-label': isCategorySelected(category)}">
-                            <div ng-init="parentHover=false" ng-class="{'hover-color': parentHover}" class="clearfix">
-                                <div class="col-md-1"></div>
-                                <div class="col-md-11" ng-mouseenter="parentHover=true" ng-mouseleave="parentHover=false">{{ category.name | removeCategory | capitalize }} <span ng-if="category['threadsUnread'] > 0" class="badge pull-right">{{category.threadsUnread}}</span></div>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+     <!-- setSelected="setSelectedCategory(category)" isSelected="isCategorySelected(category)" open="open('type')" -->
+        <div side-labels></div>
+
         <div class="col-md-11">
             <div class="inbox-nav" ng-if="getSelectedCategory().id === 'INBOX'">
                 <ul class="nav nav-pills">
-                    <li role="presentation" ng-repeat="label in topLabels track by $index" ng-click="setSelectedLabel(label)" class="col-md-2 top-label" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }} <span class="badge">{{label.unread}}</span></a></li>
+                    <li role="presentation" ng-repeat="label in topLabels" ng-click="setSelectedLabel(label)" class="col-md-2 top-label" ng-class="{'active': isLabelSelected(label)}"><a href="#{{ label.value }}" data-toggle="tab">{{ label.value }} <span class="badge">{{label.unread}}</span></a></li>
                 </ul>
             </div>
             <div class="clearfix">
-                <div class="col-md-4 message-item-container">
-                    <!-- ng-show="thread.messages[thread.messages.length - 1].labelIds.indexOf(getSelectedLabel()) != -1" -->
-                    <!-- | orderObjectBy:'threads:threadId.messages[0].payload.headers[\'Date\']' -->
-                    <div ng-repeat="thread in threads track by $index" ng-click="setSelectedThread(thread)" class="message-item" ng-animate="'animate'" ng-class="{'unread': isUnread(thread), 'selected-message-item': isThreadSelected(thread)}">
-                        <input class="message-select-check" type="checkbox" aria-label="...">
-                        <div class="message-item-info">
-                            <div class="clearfix">
-                                <div class="col-md-8">
-                                    <p class="email-from">{{ thread.messages[thread.messages.length - 1].payload.headers['From'] | removeEmail | removeSpace | removeQuotes | removeSpace }}</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <!-- <p class="pull-right">{{ thread.messages[thread.messages.length - 1].payload.headers['Date'] | date:'MM/dd/yyyy' }}</p> -->
-                                    <!-- <p class="email-date pull-right">{{ thread.messages[thread.messages.length - 1].payload.headers['Date'] | date:'yyyy-MM-dd HH:mm:ss Z' }}</p> -->
-                                    <p class="email-date pull-right">{{ thread.messages[thread.messages.length - 1].payload.headers['Date'] | displayDate }}
-                                </div>
-                            </div>
-                            <div class="clearfix">
-                                <div class="col-md-10">
-                                    <p class="email-subject">{{ thread.messages[thread.messages.length - 1].payload.headers['Subject'] }}</p>
-                                </div>
-                                <div class="col-md-2" ng-if="thread.hasAttachments" title="{{ thread.attachments | joinNames }}">
-                                    <i class="glyphicon glyphicon-paperclip pull-right"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-8 message-container">
-                    <p>{{ selectedThread.threadId }}</p>
-                    <div ng-repeat="message in selectedThread.messages track by $index" ng-init="message.collapseBody = $index === selectedThread.messages.length - 1; message.showHeaders = false;" ng-class="{'border-top': message.labelIds.indexOf('CHAT'), 'collapsed-body': !message.collapseBody}">
-                        <div ng-if="message.labelIds.indexOf('CHAT')" ng-init="emailId = $index">
-                            <div class="message-container-header" ng-click="collapseMessageBody($event, message, $index)">
-                                <div class="message-container-main-header">
-                                    <div class="clearfix">
-                                        <div class="col-md-8">
-                                            <p class="email-from">{{ message.payload.headers['From'] | removeEmail }}</p>
-                                        </div>
-                                        <div class="col-md-4 header-right">
-                                            <i ng-if="message.hasAttachments" title="{{ message.attachments | joinNames }}" class="glyphicon glyphicon-paperclip"></i>
-                                            <p class="email-date" title="{{ message.payload.headers['Date'] }}"> {{ message.payload.headers['Date'] | displayDate }}</p>
-                                            <div ng-if="message.collapseBody" class="btn-group" uib-dropdown id="ignore-click-actions-{{$index}}">
-                                                <button id="split-button" type="button" class="btn btn-default" ng-init="message.showReply=false" ng-click="message.showReply=!message.showReply"><span class="icon-filp glyphicon glyphicon-share-alt"></span></button>
-                                                <button type="button" class="btn btn-default" uib-dropdown-toggle>
-                                                    <span class="caret"></span>
-                                                    <span class="sr-only">Split button!</span>
-                                                </button>
-                                                <ul class="actions-dropdown" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-                                                    <li role="menuitem"><a ng-click="open('reply', message)">Reply</a></li>
-                                                    <li ng-if="$index !== 0" role="menuitem"><a>Reply All</a></li>
-                                                    <li role="menuitem" ng-click="open('forward', message)"><a>Forward</a></li>
-                                                    <li role="menuitem"><a>Delete</a></li>
-                                                    <li class="divider"></li>
-                                                    <li role="menuitem"><a ng-click="modifyLabels(message.messageId, ['UNREAD'])">Mark as unread</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="message-container-sub-header">
-                                    <div class="clearfix">
-                                        <div class="col-md-12">
-                                            <p class="email-to">to {{ message.payload.headers['To'] | removeEmail }}</p>
-                                            <ul class="header-details" ng-if="message.collapseBody" id="ignore-click-{{$index}}">
-                                                <li><i ng-click="toggleMessageHeaders(message)" id="{{ $index }}" class="glyphicon glyphicon-triangle-bottom"></i></li>
-                                                <li ng-if="message.showHeaders">
-                                                    <div popup-not-focused="toggleMessageHeaders(message)" class="message-container-header-details form-horizontal col-md-6" data-reference-id="{{ $index }}">
-                                                        <!-- <p>Labels: {{message.labelIds}}</p> -->
-                                                        <div class="form-group" ng-if="message.payload.headers['From']">
-                                                            <label class="col-sm-2 control-label">From:</label>
-                                                            <div class="col-sm-10">
-                                                                {{ message.payload.headers['From'] }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" ng-if="message.payload.headers['To']">
-                                                            <label class="col-sm-2 control-label">To:</label>
-                                                            <div class="col-sm-10">
-                                                                {{ message.payload.headers['To'] }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" ng-if="message.payload.headers['Cc']">
-                                                            <label class="col-sm-2 control-label">Cc:</label>
-                                                            <div class="col-sm-10">
-                                                                {{ message.payload.headers['Cc'] }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" ng-if="message.payload.headers['Bcc']">
-                                                            <label class="col-sm-2 control-label">Bcc:</label>
-                                                            <div class="col-sm-10">
-                                                                {{ message.payload.headers['Bcc'] }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" ng-if="message.payload.headers['Subject']">
-                                                            <label class="col-sm-2 control-label">Subject:</label>
-                                                            <div class="col-sm-10">
-                                                                {{ message.payload.headers['Subject'] }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group" ng-if="message.payload.headers['Date']">
-                                                            <label class="col-sm-2 control-label">Date:</label>
-                                                            <div class="col-sm-10">
-                                                                {{ message.payload.headers['Date'] }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!--                             <div ng-if="message.labelIds.indexOf('CHAT')">
-                                                        <p><strong>Labels:</strong> {{message.labelIds}}</p>
-                                                        <p><strong>Subject:</strong> {{ message.payload.headers['Subject'] }}</p>
-                                                        <p><strong>From:</strong> {{ message.payload.headers['From'] }}</p>
-                                                        <p><strong>To:</strong> {{ message.payload.headers['To'] }}</p>
-                                                        <p><strong>Date:</strong> {{ message.payload.headers['Date'] }}</p>
-                                                    </div> -->
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <span ng-if="!message.labelIds.indexOf('CHAT')"><strong>{{ message.payload.headers['From'] | removeEmail }}</strong></span>
-                        <div ng-if="message.collapseBody" class="message-body">
-                            <div ng-if="message.attachments.length > 0">
-                                <div class="attachment-info">
-                                    <p>{{message.attachments.length}} Attachments</p>
-                                </div>
-                                <div class="attachments row">
-                                    <a ng-repeat="attachment in message.attachments track by $index" ng-if="attachment.contentDisposition === 'attachment'" href="{{attachment.link}}" download="{{attachment.fileName}}" class="pull-left attachment-box col-md-2">
-                                        <div>
-                                            <div class="file-icon">
-                                                <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
-                                            </div>
-                                            <div class="file-name">{{attachment.fileName}}</div>
-                                            <div class="file-size">{{attachment.size | bytes }}</div>
-                                            <div class="download-attachment">
-                                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div ng-if="message.payload.body.data !== null">
-                                <div ng-if="message.payload.mimeType === 'text/plain'">{{message.payload.body.data}}</div>
-                                <div ng-if="message.payload.mimeType === 'text/html'" ng-bind-html="renderHtml(message.payload.body.data)"></div>
-                            </div>
-                            <div ng-repeat="part in message.payload.parts track by $index">
-                                <div ng-if="part.mimeType === 'text/html'">
-                                    <div ng-bind-html="renderHtml(part.body.data)"></div>
-                                </div>
-                                <!--         <div ng-if="part.mimeType === 'text/plain'">
-                  <div>{{part.body.data}}</div>
-                </div> -->
-                                <div ng-repeat="pp in part.parts track by $index">
-                                    <div ng-if="pp.mimeType === 'text/html'">
-                                        <div ng-bind-html="renderHtml(pp.body.data)"></div>
-                                    </div>
-                                    <!--           <div ng-if="pp.mimeType === 'text/plain'">
-                    <div>{{pp.body.data}}</div>
-                  </div> -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="div-reply" ng-if="message.showReply" ng-include="'./assets/partials/reply.html'"></div>
-                    </div>
-                </div>
+                <div message-list></div>
+                <div message-details></div>
             </div>
         </div>
     </div>

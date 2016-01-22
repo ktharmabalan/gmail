@@ -10,7 +10,6 @@ app.controller('userController', ['$scope', '$http', function($scope, $http) {
 
         $http.get(url).success(function(response) {
         	if (args['search'] == "profile" && args['method'] == "get") {
-                console.log(response);
                 $scope.username = response['email'];
             }
         });

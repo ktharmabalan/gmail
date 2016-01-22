@@ -1,7 +1,6 @@
 <?php
 // require __DIR__ . '/libs/constants.php';
 require __DIR__ . '/libs/functions.php';
-// require __DIR__ . '/libs/HttpRequest.php';
 
 if (isset($_GET['code'])) {
     $authCode = trim($_GET['code']);
@@ -104,7 +103,8 @@ if (file_exists($credentialsPath)) {
                 break;
             case 'category':
                 if($method == "list") {
-                    $result = label_list($service, $userId);
+                    unset($optParams['maxResults']);
+                    $result = label_list($service, $userId, $optParams);
                 }
                 break;
             case 'attachment':
@@ -226,58 +226,6 @@ if (file_exists($credentialsPath)) {
 
                 // print('Message sent object');
                 // print_r($objSentMsg);
-
-
-
-
-//--------------------------
-                $options = array(
-                    'Authorization' => "Bearer {$accessToken}",
-                    'Host' => 'www.googleapis.com',
-                    'Content-Type' => 'Content-Type: multipart/related; boundary=foo_bar_baz',
-                    'Content-Length' => 2000000,
-
-                    );
-
-
-                $body = "Content-Type: multipart/mixed; boundary=\"foo_bar_baz\"
-Content-Length: 99999999999999999999999999
-
---foo_bar_baz
-Content-Type: text/plain; charset=\"UTF-8\"
-
-This is a message just to say hello. So, \"Hello\"
-
---foo_bar_baz
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=\"anothertest.jpg\"
-Content-Type: message/rfc822;
-
-(image data)
-
---foo_bar_baz--";
-                $r = http_post_fields('https://www.googleapis.com/upload/gmail/v1/users/{$userId}/messages/send?uploadType=media', $data);
-                // $r = new HttpRequest('https://www.googleapis.com/upload/gmail/v1/users/{$userId}/messages/send?uploadType=media', 'POST', $options);
-                $r->body = $body;
-                // $r->setOptions(
-                //     array(
-                //         'cookies' => array('lang' => 'de'))
-                //     );
-                $result = $r->send();
-                //print out the result
-                print_r($result);
-
-
-
-
-
-
-
-
-
-
-//---------------------------------
 
 
 /*                // Upload to GoogleDrive
